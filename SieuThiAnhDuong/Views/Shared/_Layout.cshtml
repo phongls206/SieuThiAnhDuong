@@ -42,6 +42,10 @@
                         <a asp-controller="Invoice" asp-action="Create"><i class="bi bi-cart4"></i> Bán hàng</a>
                     </li>
                 }
+                   @* 3. THỐNG KÊ (Đã sửa action thành Monthly) *@
+                <li class="@(controller == "Report" ? "active" : "")">
+                    <a asp-controller="Report" asp-action="Monthly"><i class="bi bi-graph-up"></i> Thống kê</a>
+                </li>
 
                 @* 2. QUẢN LÝ HÀNG HÓA *@
                 @if (chucVu == "Admin" || chucVu == "Thủ kho")
@@ -51,10 +55,7 @@
                     </li>
                 }
 
-                @* 3. THỐNG KÊ (Đã sửa action thành Monthly) *@
-                <li class="@(controller == "Report" ? "active" : "")">
-                    <a asp-controller="Report" asp-action="Monthly"><i class="bi bi-graph-up"></i> Thống kê</a>
-                </li>
+             
 
                 @* 4. QUẢN TRỊ *@
                 @if (chucVu == "Admin")
