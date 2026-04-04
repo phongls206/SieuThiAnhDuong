@@ -15,17 +15,17 @@ namespace SieuThiAnhDuong.Controllers
             _context = context;
         }
 
-        // 1. Trang danh sách tài khoản (Đã lọc nhân viên chưa có TK)
+       
         public async Task<IActionResult> Index()
         {
             var danhSachTaiKhoan = await _context.TaiKhoans
                                          .Include(t => t.NhanVien)
                                          .ToListAsync();
 
-            // Lấy ID những người đã có tài khoản
+           
             var idNhanVienDaCoTK = await _context.TaiKhoans.Select(tk => tk.MaNV).ToListAsync();
 
-            // Chỉ lấy nhân viên chưa có tài khoản để hiện lên Modal chọn
+            
             var nhanVienChuaCoTK = await _context.NhanViens
                                          .Where(nv => !idNhanVienDaCoTK.Contains(nv.MaNV))
                                          .ToListAsync();
@@ -35,18 +35,18 @@ namespace SieuThiAnhDuong.Controllers
             return View(danhSachTaiKhoan);
         }
 
-        // 2. Xử lý tạo tài khoản (Đã fix lỗi NULL Quyen)
+    
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TaiKhoan taiKhoan)
         {
             try
             {
-                // Bước 1: Tìm thông tin nhân viên để lấy chức vụ gán vào Quyền
+                
                 var nv = await _context.NhanViens.FindAsync(taiKhoan.MaNV);
                 if (nv != null)
                 {
-                    // Tự động gán Quyền = Chức vụ của nhân viên (Tránh lỗi NULL cột Quyen)
+                    
                     taiKhoan.Quyen = nv.ChucVu;
                 }
                 else
@@ -55,7 +55,7 @@ namespace SieuThiAnhDuong.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Bước 2: Kiểm tra xem nhân viên này lỡ có tài khoản chưa (đề phòng bấm nhanh)
+             
                 var exists = await _context.TaiKhoans.AnyAsync(tk => tk.MaNV == taiKhoan.MaNV);
                 if (exists)
                 {
@@ -63,7 +63,7 @@ namespace SieuThiAnhDuong.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Bước 3: Kiểm tra tên đăng nhập có bị trùng không
+                
                 var userExists = await _context.TaiKhoans.AnyAsync(tk => tk.TenDangNhap == taiKhoan.TenDangNhap);
                 if (userExists)
                 {
@@ -84,7 +84,7 @@ namespace SieuThiAnhDuong.Controllers
             }
         }
 
-        // 3. Xử lý Reset mật khẩu (Giữ nguyên)
+       
         [HttpPost]
         public async Task<IActionResult> ResetPassword(string id)
         {
@@ -99,7 +99,7 @@ namespace SieuThiAnhDuong.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // 4. Xử lý xóa tài khoản (Giữ nguyên)
+       
         [HttpPost]
         public async Task<IActionResult> Delete(string id)
         {

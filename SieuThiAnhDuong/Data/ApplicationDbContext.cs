@@ -20,7 +20,7 @@ namespace SieuThiAnhDuong.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Ép kiểu cho các cột tiền tệ để SQL không từ chối dữ liệu
+            
             modelBuilder.Entity<SanPham>()
                 .Property(p => p.GiaBan)
                 .HasColumnType("decimal(18,2)");

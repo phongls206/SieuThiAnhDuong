@@ -15,8 +15,7 @@ namespace SieuThiAnhDuong.Models
         [Display(Name = "Mật khẩu")]
         public string MatKhau { get; set; }
 
-        // Bỏ dấu '?' để ép kiểu dữ liệu không được Null trong DB nếu cần
-        // Hoặc giữ lại nhưng phải đảm bảo Controller luôn gán giá trị trước khi SaveChanges
+        
         [Display(Name = "Quyền hạn")]
         public string Quyen { get; set; }
 

@@ -45,7 +45,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    @* Cập nhật max=@p.SoLuongTon để chặn nhập quá số lượng *@
+                                    
                                     <input type="number" id="qty-@p.MaSP"
                                            value="@(p.SoLuongTon > 0 ? 1 : 0)"
                                            min="0"
@@ -95,26 +95,25 @@
 <script>
     let cart = [];
 
-    // 1. Hàm kiểm tra: Chặn số âm, chặn vượt quá tồn kho, khóa nút khi = 0
     function checkQty(id, maxStock) {
         let qtyInput = document.getElementById('qty-' + id);
         let btnAdd = document.getElementById('btn-add-' + id);
         let currentVal = parseInt(qtyInput.value);
 
-        // Chặn số âm
+        
         if (currentVal < 0 || isNaN(currentVal)) {
             qtyInput.value = 0;
             currentVal = 0;
         }
 
-        // Chặn vượt quá tồn kho
+        
         if (currentVal > maxStock) {
             alert("Số lượng tồn kho không đủ! (Tối đa: " + maxStock + ")");
             qtyInput.value = maxStock;
             currentVal = maxStock;
         }
 
-        // Khóa nút nếu bằng 0
+        
         if (currentVal === 0) {
             btnAdd.disabled = true;
             btnAdd.classList.replace('btn-primary', 'btn-secondary');
@@ -124,14 +123,14 @@
         }
     }
 
-    // 2. Thêm vào giỏ hàng (Kiểm tra thêm tồn kho thực tế)
+    
     function addToCart(id, name, price, maxStock) {
         let qtyInput = document.getElementById('qty-' + id);
         let qty = parseInt(qtyInput.value);
 
         if (isNaN(qty) || qty <= 0) return;
 
-        // Tìm xem sản phẩm đã có trong giỏ chưa để tính tổng
+       
         let existingItem = cart.find(item => item.maSP === id);
         let totalInCart = (existingItem ? existingItem.soLuong : 0) + qty;
 
@@ -146,13 +145,13 @@
             cart.push({ maSP: id, ten: name, soLuong: qty, donGia: price });
         }
 
-        // Reset ô nhập về 1 (nếu kho còn hàng), nếu không thì về 0
+       
         qtyInput.value = (maxStock > 0) ? 1 : 0;
         checkQty(id, maxStock);
         renderCart();
     }
 
-    // 3. Hiển thị giỏ hàng
+    
     function renderCart() {
         let html = '';
         let total = 0;
@@ -184,7 +183,7 @@
         renderCart();
     }
 
-    // 4. Gửi dữ liệu thanh toán
+   
     function finishOrder() {
         if (cart.length === 0) {
             alert("Giỏ hàng đang trống!");
@@ -221,16 +220,16 @@
 </script>
 @section Scripts {
     <script>
-        // Bắt sự kiện mỗi khi gõ phím vào ô tìm kiếm
+       
         document.getElementById('searchProduct').addEventListener('keyup', function () {
             var searchValue = this.value.toLowerCase();
             var tableRows = document.querySelectorAll('#productList tr');
 
             tableRows.forEach(function (row) {
-                // Lấy nội dung của cột đầu tiên (Tên sản phẩm)
+                
                 var productName = row.cells[0].textContent.toLowerCase();
                 
-                // Ẩn/hiện dòng dựa trên kết quả tìm kiếm
+               
                 if (productName.includes(searchValue)) {
                     row.style.display = '';
                 } else {

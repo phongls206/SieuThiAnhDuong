@@ -10,13 +10,12 @@ namespace SieuThiAnhDuong.Controllers
         private readonly ApplicationDbContext _context;
         public EmployeeController(ApplicationDbContext context) => _context = context;
 
-        // 1. Danh sách nhân viên
         public async Task<IActionResult> Index() => View(await _context.NhanViens.ToListAsync());
 
-        // 2. Thêm nhân viên (Giao diện)
+       
         public IActionResult Create() => View();
 
-        // 3. Xử lý thêm nhân viên
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(NhanVien nhanVien)
@@ -35,7 +34,7 @@ namespace SieuThiAnhDuong.Controllers
             }
         }
 
-        // 4. Sửa nhân viên (GET)
+        
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -46,7 +45,7 @@ namespace SieuThiAnhDuong.Controllers
             return View(nhanVien);
         }
 
-        // 5. Xử lý sửa nhân viên (POST)
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("MaNV,HoTen,ChucVu,SoDT,DiaChi")] NhanVien nhanVien)
@@ -73,12 +72,12 @@ namespace SieuThiAnhDuong.Controllers
             return View(nhanVien);
         }
 
-        // 6. Xử lý xóa nhân viên - ĐÃ THÊM BẢO VỆ ADMIN
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            // BẢO VỆ TỐI CAO: Không cho phép xóa nhân viên có mã số 1 (Admin Phong)
+    
             if (id == 1)
             {
                 TempData["Error"] = "Cảnh báo: Không thể xóa tài khoản Quản trị viên hệ thống!";

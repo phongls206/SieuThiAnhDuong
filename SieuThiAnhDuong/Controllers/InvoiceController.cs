@@ -24,7 +24,7 @@ namespace SieuThiAnhDuong.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(List<ChiTietHoaDon> details)
         {
-            // --- BƯỚC 1: LẤY MANV TỪ NGƯỜI ĐANG ĐĂNG NHẬP (FIX LỖI SAI TÊN) ---
+            
             var maNVClaim = User.FindFirst("MaNV")?.Value;
             if (string.IsNullOrEmpty(maNVClaim))
             {
@@ -32,14 +32,14 @@ namespace SieuThiAnhDuong.Controllers
             }
             int idNhanVienDangLogin = int.Parse(maNVClaim);
 
-            // --- BƯỚC 2: KIỂM TRA GIỎ HÀNG ---
+            
             if (details == null || !details.Any())
             {
                 TempData["Error"] = "Giỏ hàng đang trống!";
                 return RedirectToAction(nameof(Create));
             }
 
-            // --- BƯỚC 3: KIỂM TRA TỒN KHO (CHẶN SỐ ÂM) ---
+            
             foreach (var item in details)
             {
                 var product = await _context.SanPhams.AsNoTracking()
@@ -52,7 +52,7 @@ namespace SieuThiAnhDuong.Controllers
                 }
             }
 
-            // --- BƯỚC 4: LƯU HÓA ĐƠN ---
+            
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
@@ -60,7 +60,7 @@ namespace SieuThiAnhDuong.Controllers
                     var invoice = new HoaDon
                     {
                         NgayLap = DateTime.Now,
-                        MaNV = idNhanVienDangLogin, // Sử dụng ID lấy từ hệ thống, không lấy từ Form
+                        MaNV = idNhanVienDangLogin, 
                         TongTien = details.Sum(x => x.SoLuong * x.DonGia)
                     };
 
@@ -71,7 +71,7 @@ namespace SieuThiAnhDuong.Controllers
                     {
                         var product = await _context.SanPhams.FindAsync(item.MaSP);
 
-                        // Trừ kho thực tế
+                        
                         product.SoLuongTon -= item.SoLuong;
 
                         _context.ChiTietHoaDons.Add(new ChiTietHoaDon

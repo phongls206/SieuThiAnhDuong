@@ -13,7 +13,7 @@ namespace SieuThiAnhDuong.Models
         public string SoDT { get; set; }
         public string ChucVu { get; set; }
 
-        // Liên kết với Tài Khoản và Hóa Đơn
+        
         public virtual TaiKhoan? TaiKhoan { get; set; }
         public virtual ICollection<HoaDon>? HoaDons { get; set; }
     }

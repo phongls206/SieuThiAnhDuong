@@ -16,9 +16,9 @@ namespace SieuThiAnhDuong.Models
         [Range(0, int.MaxValue, ErrorMessage = "Số lượng tồn phải từ 0 trở lên")]
         public int SoLuongTon { get; set; }
 
-        public string? DonViTinh { get; set; } // Nên để dấu ? để tránh lỗi null
+        public string? DonViTinh { get; set; }
 
-        [ValidateNever] // Quan trọng: Ngăn chặn báo lỗi "Required" khi Lưu
+        [ValidateNever] 
         public virtual ICollection<ChiTietHoaDon>? ChiTietHoaDons { get; set; } = new List<ChiTietHoaDon>();
     }
 }

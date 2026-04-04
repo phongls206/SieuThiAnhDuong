@@ -1,7 +1,7 @@
 ﻿@model SieuThiAnhDuong.Models.HoaDon
 
 @{
-    // Lấy chức vụ từ Claims để phân quyền hiển thị nút
+   
     var chucVu = User.FindFirst("ChucVu")?.Value ?? "";
 }
 
@@ -67,7 +67,7 @@
                     <i class="bi bi-arrow-left"></i> Quay lại danh sách
                 </a>
 
-                @* CHỈ HIỆN NÚT IN NẾU KHÔNG PHẢI THỦ KHO *@
+                
                 @if (chucVu != "Thủ kho")
                 {
                     <button onclick="window.print()" class="btn btn-dark">
@@ -88,7 +88,7 @@
 @section Scripts {
     <style>
         @@media print {
-            /* Ẩn các nút và thanh breadcrumb khi in thực tế */
+            
             .btn, .breadcrumb, .sidebar, .top-info {
                 display: none !important;
             }
