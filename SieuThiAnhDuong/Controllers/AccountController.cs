@@ -28,37 +28,23 @@ namespace SieuThiAnhDuong.Controllers
 
             if (user != null)
             {
-                // CHUẨN HÓA ROLE: Đưa Manager/Thủ kho về cùng 1 định dạng để Layout nhận diện đúng
-                string userRole = user.Quyen?.Trim() ?? "Nhân viên";
-                if (userRole == "Manager") userRole = "Thủ kho"; 
+                string chucVuThucTe = user.NhanVien?.ChucVu ?? "Nhân viên";
 
                 var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.TenDangNhap),
-                    
-                    // Gán Role đã chuẩn hóa
-                    new Claim(ClaimTypes.Role, userRole),
-                    
-                    new Claim("FullName", user.NhanVien?.HoTen ?? user.TenDangNhap),
-                    new Claim("MaNV", user.MaNV.ToString())
-                };
+        {
+            new Claim(ClaimTypes.Name, user.TenDangNhap),
+            new Claim(ClaimTypes.Role, chucVuThucTe),
+            new Claim("ChucVu", chucVuThucTe),
+            new Claim("FullName", user.NhanVien?.HoTen ?? user.TenDangNhap),
+            new Claim("MaNV", user.MaNV.ToString())
+        };
 
-                // Xóa sạch các Identity cũ trước khi tạo mới để tránh bị "nhồi" nhiều Role
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                var authProperties = new AuthenticationProperties
-                {
-                    IsPersistent = true, 
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddDays(1)
-                };
-
-                // Đăng xuất mọi phiên làm việc cũ trước khi đăng nhập mới
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity),
-                    authProperties);
+                    new AuthenticationProperties { IsPersistent = true });
 
                 return RedirectToAction("Index", "Home");
             }

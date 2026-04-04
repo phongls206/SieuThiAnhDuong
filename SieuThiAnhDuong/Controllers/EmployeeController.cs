@@ -35,7 +35,7 @@ namespace SieuThiAnhDuong.Controllers
             }
         }
 
-        // 4. Sửa nhân viên (Mở giao diện - GET)
+        // 4. Sửa nhân viên (GET)
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -46,14 +46,13 @@ namespace SieuThiAnhDuong.Controllers
             return View(nhanVien);
         }
 
-        // 5. XỬ LÝ LƯU THAY ĐỔI (PHẦN BỊ THIẾU CỦA BẠN - POST)
+        // 5. Xử lý sửa nhân viên (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("MaNV,HoTen,ChucVu,SoDT,DiaChi")] NhanVien nhanVien)
         {
             if (id != nhanVien.MaNV) return NotFound();
 
-            // Xóa bỏ kiểm tra bắt buộc cho 2 trường đang báo lỗi
             ModelState.Remove("TaiKhoan");
             ModelState.Remove("HoaDons");
 
@@ -73,17 +72,32 @@ namespace SieuThiAnhDuong.Controllers
             }
             return View(nhanVien);
         }
-        // 6. Xử lý xóa nhân viên
+
+        // 6. Xử lý xóa nhân viên - ĐÃ THÊM BẢO VỆ ADMIN
         [HttpPost]
-        [ValidateAntiForgeryToken] // Thêm cho an toàn
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            // BẢO VỆ TỐI CAO: Không cho phép xóa nhân viên có mã số 1 (Admin Phong)
+            if (id == 1)
+            {
+                TempData["Error"] = "Cảnh báo: Không thể xóa tài khoản Quản trị viên hệ thống!";
+                return RedirectToAction(nameof(Index));
+            }
+
             var nv = await _context.NhanViens.FindAsync(id);
             if (nv != null)
             {
-                _context.NhanViens.Remove(nv);
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Đã xóa nhân viên thành công!";
+                try
+                {
+                    _context.NhanViens.Remove(nv);
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = "Đã xóa nhân viên thành công!";
+                }
+                catch (Exception)
+                {
+                    TempData["Error"] = "Không thể xóa nhân viên này vì đang có dữ liệu liên quan (Hóa đơn/Tài khoản)!";
+                }
             }
             return RedirectToAction(nameof(Index));
         }

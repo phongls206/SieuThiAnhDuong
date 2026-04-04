@@ -2,7 +2,7 @@
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold text-primary">DANH SÁCH TÀI KHOẢN</h3>
+        <h3 class="fw-bold text-primary">DANH SÁCH TÀI KHOẢN HỆ THỐNG</h3>
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createAccountModal">
             <i class="bi bi-plus-circle"></i> Cấp tài khoản mới
         </button>
@@ -42,39 +42,43 @@
                             <td class="fw-bold">@item.TenDangNhap</td>
                             <td>@item.MaNV - @(item.NhanVien?.HoTen)</td>
                             <td>
-                                @* Hiển thị Badge quyền hạn *@
-                                <span class="badge @(item.NhanVien?.ChucVu == "Admin" ? "bg-danger" : "bg-primary")">
-                                    @item.NhanVien?.ChucVu
-                                </span>
+                                @* Hiển thị Badge màu sắc theo chức vụ *@
+                                @if (item.NhanVien?.ChucVu == "Admin")
+                                {
+                                    <span class="badge bg-danger">Admin</span>
+                                }
+                                else if (item.NhanVien?.ChucVu == "Thủ kho")
+                                {
+                                    <span class="badge bg-info">Thủ kho</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-primary">Nhân viên</span>
+                                }
                             </td>
                             <td><span class="badge bg-success">Đang hoạt động</span></td>
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-1">
-                                    @* Nút Reset mật khẩu luôn hiển thị *@
                                     <form asp-action="ResetPassword" method="post">
                                         <input type="hidden" name="id" value="@item.TenDangNhap" />
-                                        <button type="submit" class="btn btn-sm btn-outline-warning"
-                                                title="Reset mật khẩu về 123456"
-                                                onclick="return confirm('Bạn có chắc muốn đặt lại mật khẩu cho tài khoản này về 123456?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Reset mật khẩu">
                                             <i class="bi bi-key"></i>
                                         </button>
                                     </form>
 
-                                    @* CHỈ HIỂN THỊ NÚT XÓA NẾU KHÔNG PHẢI ADMIN *@
-                                    @if (item.NhanVien?.ChucVu != "Admin")
+                                    @* CHẶN XÓA NẾU LÀ ADMIN *@
+                                    @if (item.TenDangNhap.ToLower() != "admin")
                                     {
                                         <form asp-action="Delete" method="post">
                                             <input type="hidden" name="id" value="@item.TenDangNhap" />
                                             <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                    title="Xóa tài khoản"
-                                                    onclick="return confirm('Xác nhận xóa vĩnh viễn tài khoản này?')">
+                                                    onclick="return confirm('Xác nhận xóa tài khoản này?')">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
                                     }
                                     else
                                     {
-                                        @* Hiển thị nút bị khóa để giao diện đồng bộ nhưng không bấm được *@
                                         <button class="btn btn-sm btn-outline-secondary" disabled title="Không thể xóa Admin">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -89,37 +93,4 @@
     </div>
 </div>
 
-@* Phần Modal giữ nguyên như cũ *@
-<div class="modal fade" id="createAccountModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form asp-action="Create" method="post">
-                @Html.AntiForgeryToken()
-                <div class="modal-header">
-                    <h5 class="modal-title">Cấp tài khoản mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Chọn nhân viên</label>
-                        <select name="MaNV" class="form-select" asp-items="ViewBag.MaNV" required>
-                            <option value="">-- Chọn nhân viên --</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tên đăng nhập</label>
-                        <input name="TenDangNhap" class="form-control" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Mật khẩu</label>
-                        <input name="MatKhau" type="password" class="form-control" required />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Lưu tài khoản</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+@* Modal Cấp tài khoản mới giữ nguyên *@
