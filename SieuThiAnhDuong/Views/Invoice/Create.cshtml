@@ -12,109 +12,204 @@
 
 <div class="row">
     <div class="col-md-8">
-        <h3>Chọn sản phẩm</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Sản phẩm</th>
-                    <th>Giá</th>
-                    <th>Số lượng</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody id="productList">
-                @foreach (var p in ViewBag.Products)
-                {
-                    <tr>
-                        <td>@p.TenSP</td>
-                        <td>@p.GiaBan</td>
-                        <td><input type="number" id="qty-@p.MaSP" value="1" class="form-control w-50" /></td>
-                        <td>
-                            <button onclick="addToCart(@p.MaSP, '@p.TenSP', @p.GiaBan)" class="btn btn-primary btn-sm">Thêm</button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h4 class="mb-0 text-primary"><i class="bi bi-search me-2"></i>Chọn sản phẩm</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Giá bán</th>
+                            <th class="text-center">Tồn kho</th>
+                            <th style="width: 130px;">Số lượng</th>
+                            <th class="text-end">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productList">
+                        @foreach (var p in ViewBag.Products)
+                        {
+                            <tr>
+                                <td class="fw-bold">@p.TenSP</td>
+                                <td class="text-danger">@p.GiaBan.ToString("N0") đ</td>
+                                <td class="text-center">
+                                    <span class="badge @(p.SoLuongTon > 0 ? "bg-info" : "bg-danger")">
+                                        @p.SoLuongTon
+                                    </span>
+                                </td>
+                                <td>
+                                    @* Cập nhật max=@p.SoLuongTon để chặn nhập quá số lượng *@
+                                    <input type="number" id="qty-@p.MaSP"
+                                           value="@(p.SoLuongTon > 0 ? 1 : 0)"
+                                           min="0"
+                                           max="@p.SoLuongTon"
+                                           oninput="checkQty(@p.MaSP, @p.SoLuongTon)"
+                                           class="form-control form-control-sm text-center fw-bold"
+                                    @(p.SoLuongTon <= 0 ? "disabled" : "") />
+                                </td>
+                                <td class="text-end">
+                                    <button id="btn-add-@p.MaSP"
+                                            onclick="addToCart(@p.MaSP, '@p.TenSP', @p.GiaBan, @p.SoLuongTon)"
+                                            class="btn @(p.SoLuongTon > 0 ? "btn-primary" : "btn-secondary") btn-sm px-3"
+                                        @(p.SoLuongTon <= 0 ? "disabled" : "")>
+                                        <i class="bi bi-plus-circle me-1"></i> Thêm
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     
     <div class="col-md-4">
-        <h3>Giỏ hàng</h3>
-        <ul id="cart" class="list-group mb-3"></ul>
-        <div class="h4">Tổng cộng: <span id="totalAmount">0</span> đ</div>
-        <button onclick="finishOrder()" class="btn btn-success w-100">THANH TOÁN & IN HÓA ĐƠN</button>
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-success text-white py-3">
+                <h4 class="mb-0"><i class="bi bi-cart3 me-2"></i>Giỏ hàng</h4>
+            </div>
+            <div class="card-body">
+                <ul id="cart" class="list-group list-group-flush mb-3" style="min-height: 200px; max-height: 400px; overflow-y: auto;">
+                    <li class="text-muted text-center py-4">Chưa có sản phẩm nào</li>
+                </ul>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="h5 mb-0">Tổng cộng:</span>
+                    <span class="h4 mb-0 text-danger fw-bold"><span id="totalAmount">0</span> đ</span>
+                </div>
+                <button onclick="finishOrder()" class="btn btn-success w-100 py-3 fw-bold shadow-sm">
+                    <i class="bi bi-printer me-2"></i> THANH TOÁN & IN HÓA ĐƠN
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
     let cart = [];
 
-    // Hàm 1: Thêm vào giỏ hàng
-    function addToCart(id, name, price) {
-        let qty = document.getElementById('qty-' + id).value;
-        cart.push({ maSP: id, ten: name, soLuong: parseInt(qty), donGia: price });
+    // 1. Hàm kiểm tra: Chặn số âm, chặn vượt quá tồn kho, khóa nút khi = 0
+    function checkQty(id, maxStock) {
+        let qtyInput = document.getElementById('qty-' + id);
+        let btnAdd = document.getElementById('btn-add-' + id);
+        let currentVal = parseInt(qtyInput.value);
+
+        // Chặn số âm
+        if (currentVal < 0 || isNaN(currentVal)) {
+            qtyInput.value = 0;
+            currentVal = 0;
+        }
+
+        // Chặn vượt quá tồn kho
+        if (currentVal > maxStock) {
+            alert("Số lượng tồn kho không đủ! (Tối đa: " + maxStock + ")");
+            qtyInput.value = maxStock;
+            currentVal = maxStock;
+        }
+
+        // Khóa nút nếu bằng 0
+        if (currentVal === 0) {
+            btnAdd.disabled = true;
+            btnAdd.classList.replace('btn-primary', 'btn-secondary');
+        } else {
+            btnAdd.disabled = false;
+            btnAdd.classList.replace('btn-secondary', 'btn-primary');
+        }
+    }
+
+    // 2. Thêm vào giỏ hàng (Kiểm tra thêm tồn kho thực tế)
+    function addToCart(id, name, price, maxStock) {
+        let qtyInput = document.getElementById('qty-' + id);
+        let qty = parseInt(qtyInput.value);
+
+        if (isNaN(qty) || qty <= 0) return;
+
+        // Tìm xem sản phẩm đã có trong giỏ chưa để tính tổng
+        let existingItem = cart.find(item => item.maSP === id);
+        let totalInCart = (existingItem ? existingItem.soLuong : 0) + qty;
+
+        if (totalInCart > maxStock) {
+            alert("Không thể thêm! Tổng số lượng trong giỏ hàng vượt quá tồn kho.");
+            return;
+        }
+
+        if (existingItem) {
+            existingItem.soLuong += qty;
+        } else {
+            cart.push({ maSP: id, ten: name, soLuong: qty, donGia: price });
+        }
+
+        // Reset ô nhập về 1 (nếu kho còn hàng), nếu không thì về 0
+        qtyInput.value = (maxStock > 0) ? 1 : 0;
+        checkQty(id, maxStock);
         renderCart();
     }
 
-    // Hàm 2: Hiển thị giỏ hàng ra màn hình
+    // 3. Hiển thị giỏ hàng
     function renderCart() {
         let html = '';
         let total = 0;
-        cart.forEach(item => {
-            html += `<li class="list-group-item d-flex justify-content-between">
-                        <span>${item.ten} (x${item.soLuong})</span>
-                        <span>${(item.soLuong * item.donGia).toLocaleString()} đ</span>
-                     </li>`;
-            total += item.soLuong * item.donGia;
-        });
+        if (cart.length === 0) {
+            html = '<li class="text-muted text-center py-4">Chưa có sản phẩm nào</li>';
+        } else {
+            cart.forEach((item, index) => {
+                let subTotal = item.soLuong * item.donGia;
+                html += `
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-bold">${item.ten}</div>
+                            <small class="text-muted">${item.donGia.toLocaleString()} x ${item.soLuong}</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold text-primary">${subTotal.toLocaleString()} đ</div>
+                            <button onclick="removeFromCart(${index})" class="btn btn-link btn-sm text-danger p-0 border-0"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </li>`;
+                total += subTotal;
+            });
+        }
         document.getElementById('cart').innerHTML = html;
         document.getElementById('totalAmount').innerText = total.toLocaleString();
     }
 
-    // Hàm 3: XỬ LÝ KHI BẤM NÚT THANH TOÁN (Hàm bạn đang thiếu)
+    function removeFromCart(index) {
+        cart.splice(index, 1);
+        renderCart();
+    }
+
+    // 4. Gửi dữ liệu thanh toán
     function finishOrder() {
         if (cart.length === 0) {
-            alert("Giỏ hàng đang trống! Vui lòng chọn sản phẩm trước.");
+            alert("Giỏ hàng đang trống!");
             return;
         }
 
-        // Tạo một form ẩn để gửi dữ liệu về Controller
         let form = document.createElement("form");
         form.method = "POST";
         form.action = "/Invoice/Create";
 
-        // Truyền Mã nhân viên (Tạm để số 1 là tài khoản Admin test của bạn)
         let inputMaNV = document.createElement("input");
         inputMaNV.type = "hidden";
         inputMaNV.name = "maNV";
-        inputMaNV.value = "1";
+        inputMaNV.value = "@(User.FindFirst("MaNV")?.Value ?? "1")";
         form.appendChild(inputMaNV);
 
-        // Duyệt qua giỏ hàng và tạo các ô input ẩn chứa dữ liệu
-        for (let i = 0; i < cart.length; i++) {
-            let item = cart[i];
+        cart.forEach((item, i) => {
+            appendHiddenInput(form, `details[${i}].MaSP`, item.maSP);
+            appendHiddenInput(form, `details[${i}].SoLuong`, item.soLuong);
+            appendHiddenInput(form, `details[${i}].DonGia`, item.donGia);
+        });
 
-            let inputMaSP = document.createElement("input");
-            inputMaSP.type = "hidden";
-            inputMaSP.name = `details[${i}].MaSP`; // Khớp với tham số List<ChiTietHoaDon> trong Controller
-            inputMaSP.value = item.maSP;
-            form.appendChild(inputMaSP);
-
-            let inputSoLuong = document.createElement("input");
-            inputSoLuong.type = "hidden";
-            inputSoLuong.name = `details[${i}].SoLuong`;
-            inputSoLuong.value = item.soLuong;
-            form.appendChild(inputSoLuong);
-
-            let inputDonGia = document.createElement("input");
-            inputDonGia.type = "hidden";
-            inputDonGia.name = `details[${i}].DonGia`;
-            inputDonGia.value = item.donGia;
-            form.appendChild(inputDonGia);
-        }
-
-        // Nhúng form vào trang và tự động bấm nút Submit
         document.body.appendChild(form);
         form.submit();
+    }
+
+    function appendHiddenInput(form, name, value) {
+        let input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
     }
 </script>
