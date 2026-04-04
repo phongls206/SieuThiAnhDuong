@@ -15,6 +15,12 @@
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white py-3">
                 <h4 class="mb-0 text-primary"><i class="bi bi-search me-2"></i>Chọn sản phẩm</h4>
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" id="searchProduct" class="form-control" placeholder="Nhập tên sản phẩm để tìm nhanh...">
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <table class="table table-hover align-middle">
@@ -213,3 +219,24 @@
         form.appendChild(input);
     }
 </script>
+@section Scripts {
+    <script>
+        // Bắt sự kiện mỗi khi gõ phím vào ô tìm kiếm
+        document.getElementById('searchProduct').addEventListener('keyup', function () {
+            var searchValue = this.value.toLowerCase();
+            var tableRows = document.querySelectorAll('#productList tr');
+
+            tableRows.forEach(function (row) {
+                // Lấy nội dung của cột đầu tiên (Tên sản phẩm)
+                var productName = row.cells[0].textContent.toLowerCase();
+                
+                // Ẩn/hiện dòng dựa trên kết quả tìm kiếm
+                if (productName.includes(searchValue)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+}
