@@ -1,0 +1,63 @@
+﻿@model SieuThiAnhDuong.Models.HoaDon
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Monthly">Thống kê</a></li>
+            <li class="breadcrumb-item active">Chi tiết hóa đơn #@Model.MaHD</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white p-3">
+            <h5 class="mb-0">THÔNG TIN HÓA ĐƠN #@Model.MaHD</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p class="text-muted mb-1">Nhân viên thực hiện:</p>
+                    <h5 class="fw-bold">@Model.NhanVien?.HoTen</h5>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted mb-1">Thời gian lập đơn:</p>
+                    <h5 class="fw-bold">@Model.NgayLap.ToString("dd/MM/yyyy HH:mm:ss")</h5>
+                </div>
+            </div>
+
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tên hàng hóa</th>
+                        <th class="text-center">Số lượng</th>
+                        <th class="text-end">Đơn giá</th>
+                        <th class="text-end">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ct in Model.ChiTietHoaDons)
+                    {
+                        <tr>
+                            <td>@ct.SanPham?.TenSP</td>
+                            <td class="text-center">@ct.SoLuong</td>
+                            <td class="text-end">@ct.DonGia.ToString("N0") đ</td>
+                            <td class="text-end fw-bold">@((ct.SoLuong * ct.DonGia).ToString("N0")) đ</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <th colspan="3" class="text-end">TỔNG CỘNG THANH TOÁN:</th>
+                        <th class="text-end text-danger fs-5">@Model.TongTien.ToString("N0") đ</th>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="mt-4 d-flex justify-content-between">
+                <a asp-action="Monthly" class="btn btn-secondary">Quay lại danh sách</a>
+                <button onclick="window.print()" class="btn btn-dark">
+                    <i class="bi bi-printer"></i> In hóa đơn
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

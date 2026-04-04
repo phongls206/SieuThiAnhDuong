@@ -1,0 +1,120 @@
+﻿@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-exclamation-octagon-fill me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@{
+    ViewData["Title"] = "Lập hóa đơn bán hàng";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <h3>Chọn sản phẩm</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="productList">
+                @foreach (var p in ViewBag.Products)
+                {
+                    <tr>
+                        <td>@p.TenSP</td>
+                        <td>@p.GiaBan</td>
+                        <td><input type="number" id="qty-@p.MaSP" value="1" class="form-control w-50" /></td>
+                        <td>
+                            <button onclick="addToCart(@p.MaSP, '@p.TenSP', @p.GiaBan)" class="btn btn-primary btn-sm">Thêm</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="col-md-4">
+        <h3>Giỏ hàng</h3>
+        <ul id="cart" class="list-group mb-3"></ul>
+        <div class="h4">Tổng cộng: <span id="totalAmount">0</span> đ</div>
+        <button onclick="finishOrder()" class="btn btn-success w-100">THANH TOÁN & IN HÓA ĐƠN</button>
+    </div>
+</div>
+
+<script>
+    let cart = [];
+
+    // Hàm 1: Thêm vào giỏ hàng
+    function addToCart(id, name, price) {
+        let qty = document.getElementById('qty-' + id).value;
+        cart.push({ maSP: id, ten: name, soLuong: parseInt(qty), donGia: price });
+        renderCart();
+    }
+
+    // Hàm 2: Hiển thị giỏ hàng ra màn hình
+    function renderCart() {
+        let html = '';
+        let total = 0;
+        cart.forEach(item => {
+            html += `<li class="list-group-item d-flex justify-content-between">
+                        <span>${item.ten} (x${item.soLuong})</span>
+                        <span>${(item.soLuong * item.donGia).toLocaleString()} đ</span>
+                     </li>`;
+            total += item.soLuong * item.donGia;
+        });
+        document.getElementById('cart').innerHTML = html;
+        document.getElementById('totalAmount').innerText = total.toLocaleString();
+    }
+
+    // Hàm 3: XỬ LÝ KHI BẤM NÚT THANH TOÁN (Hàm bạn đang thiếu)
+    function finishOrder() {
+        if (cart.length === 0) {
+            alert("Giỏ hàng đang trống! Vui lòng chọn sản phẩm trước.");
+            return;
+        }
+
+        // Tạo một form ẩn để gửi dữ liệu về Controller
+        let form = document.createElement("form");
+        form.method = "POST";
+        form.action = "/Invoice/Create";
+
+        // Truyền Mã nhân viên (Tạm để số 1 là tài khoản Admin test của bạn)
+        let inputMaNV = document.createElement("input");
+        inputMaNV.type = "hidden";
+        inputMaNV.name = "maNV";
+        inputMaNV.value = "1";
+        form.appendChild(inputMaNV);
+
+        // Duyệt qua giỏ hàng và tạo các ô input ẩn chứa dữ liệu
+        for (let i = 0; i < cart.length; i++) {
+            let item = cart[i];
+
+            let inputMaSP = document.createElement("input");
+            inputMaSP.type = "hidden";
+            inputMaSP.name = `details[${i}].MaSP`; // Khớp với tham số List<ChiTietHoaDon> trong Controller
+            inputMaSP.value = item.maSP;
+            form.appendChild(inputMaSP);
+
+            let inputSoLuong = document.createElement("input");
+            inputSoLuong.type = "hidden";
+            inputSoLuong.name = `details[${i}].SoLuong`;
+            inputSoLuong.value = item.soLuong;
+            form.appendChild(inputSoLuong);
+
+            let inputDonGia = document.createElement("input");
+            inputDonGia.type = "hidden";
+            inputDonGia.name = `details[${i}].DonGia`;
+            inputDonGia.value = item.donGia;
+            form.appendChild(inputDonGia);
+        }
+
+        // Nhúng form vào trang và tự động bấm nút Submit
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>

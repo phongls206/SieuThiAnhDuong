@@ -1,0 +1,96 @@
+﻿@{
+    Layout = null;
+}
+@model SieuThiAnhDuong.Models.ViewModels.LoginViewModel
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập - Siêu thị Ánh Dương</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root { --primary-blue: #007bff; --bg-light: #f8f9fa; }
+        body { background-color: #e9ecef; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .login-container { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 900px; display: flex; min-height: 500px; }
+        
+        /* Bên trái: Banner */
+        .login-sidebar { background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 40px; width: 45%; display: flex; flex-direction: column; justify-content: center; }
+        .login-sidebar h2 { font-weight: 700; margin-bottom: 20px; }
+        .login-sidebar .feature-item { display: flex; align-items: center; margin-bottom: 15px; font-size: 0.95rem; }
+        .login-sidebar .feature-item i { margin-right: 10px; color: #51cf66; }
+
+        /* Bên phải: Form */
+        .login-form-section { padding: 50px; width: 55%; display: flex; flex-direction: column; justify-content: center; }
+        .login-form-section h3 { font-weight: 700; color: #333; margin-bottom: 5px; }
+        .login-form-section p { color: #777; margin-bottom: 30px; font-size: 0.9rem; }
+        .form-control { border-radius: 8px; padding: 12px 15px; background: #fdfdfd; }
+        .btn-login { background: #007bff; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; transition: 0.3s; width: 100%; margin-top: 20px; }
+        .btn-login:hover { background: #0056b3; transform: translateY(-2px); }
+        .input-group-text { background: none; border-right: none; }
+        .form-control:focus { box-shadow: none; border-color: #007bff; }
+        .footer-text { font-size: 0.8rem; color: #999; margin-top: auto; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-sidebar">
+            <div class="mb-4">
+                <i class="bi bi-cart-fill" style="font-size: 3rem;"></i>
+            </div>
+            <h2>Siêu thị Ánh Dương</h2>
+            <p>Hệ thống Quản lý Bán hàng dành cho nhân viên và quản trị viên.</p>
+            
+            <div class="feature-list mt-4">
+                <div class="feature-item"><i class="bi bi-check-circle-fill"></i> Quản lý mặt hàng hiệu quả</div>
+                <div class="feature-item"><i class="bi bi-check-circle-fill"></i> Xử lý giao dịch nhanh chóng</div>
+                <div class="feature-item"><i class="bi bi-check-circle-fill"></i> Thống kê doanh thu chính xác</div>
+            </div>
+        </div>
+
+        <div class="login-form-section">
+            <h3>Đăng Nhập Hệ Thống</h3>
+            <p>Vui lòng nhập tài khoản để tiếp tục công việc</p>
+
+            <form asp-action="Login" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Tên đăng nhập (Mã nhân viên)</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        <input asp-for="Username" class="form-control" placeholder="Nhập tài khoản của bạn" required />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Mật khẩu</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input asp-for="Password" type="password" class="form-control" placeholder="Nhập mật khẩu" required />
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="remember">
+                        <label class="form-check-label small" for="remember">Ghi nhớ đăng nhập</label>
+                    </div>
+                
+                </div>
+
+                <button type="submit" class="btn-login">Đăng Nhập <i class="bi bi-arrow-right ms-2"></i></button>
+            </form>
+
+            <div class="footer-text mt-5">
+                Hệ thống nội bộ. Vui lòng liên hệ Quản lý nếu bạn không có tài khoản.
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

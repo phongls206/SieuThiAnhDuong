@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Siêu thị Ánh Dương - Quản lý</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body { overflow-x: hidden; background-color: #f4f7f6; }
+        .wrapper { display: flex; width: 100%; align-items: stretch; height: 100vh; }
+        #sidebar { min-width: 250px; max-width: 250px; background: #ffffff; color: #333; transition: all 0.3s; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        #sidebar .sidebar-header { padding: 20px; text-align: center; background: #fff; }
+        #sidebar .logo { width: 150px; margin-bottom: 10px; }
+        #sidebar ul.components { padding: 20px 0; }
+        #sidebar ul li a { padding: 15px 25px; display: block; color: #333; text-decoration: none; font-weight: 500; }
+        #sidebar ul li a:hover { background: #e9ecef; color: #007bff; }
+        #sidebar ul li.active > a { background: #007bff; color: #fff; }
+        #sidebar ul li i { margin-right: 10px; font-size: 1.2rem; }
+        #content { width: 100%; padding: 20px; overflow-y: auto; background-color: #fff; }
+        .top-info { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #00bfff; color: white; margin: -20px -20px 20px -20px; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <img src="~/images/logo.png" class="logo" alt="Logo"> 
+                <h5 class="fw-bold mt-2 text-primary">ÁNH DƯƠNG MART</h5>
+            </div>
+<ul class="list-unstyled components">
+    
+@* 1. BÁN HÀNG: Chỉ hiện cho Admin HOẶC người chỉ có quyền Nhân viên (không được có quyền Thủ kho) *@
+@if (User.IsInRole("Admin") || 
+    ((User.IsInRole("Nhân viên") || User.IsInRole("Staff")) && !User.IsInRole("Thủ kho") && !User.IsInRole("Manager")))
+{
+    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Invoice" ? "active" : "")">
+        <a asp-controller="Invoice" asp-action="Create"><i class="bi bi-cart4"></i> Bán hàng</a>
+    </li>
+}
+
+@* 2. QUẢN LÝ HÀNG HÓA: Hiện cho Admin hoặc bất cứ ai là Thủ kho/Manager *@
+@if (User.IsInRole("Admin") || User.IsInRole("Thủ kho") || User.IsInRole("Manager"))
+{
+    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Product" ? "active" : "")">
+        <a asp-controller="Product" asp-action="Index"><i class="bi bi-box-seam"></i> Quản lý hàng hóa</a>
+    </li>
+}
+
+    @* 3. QUẢN TRỊ HỆ THỐNG: Chỉ Admin *@
+    @if (User.IsInRole("Admin"))
+    {
+        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "UserAccount" ? "active" : "")">
+            <a asp-controller="UserAccount" asp-action="Index"><i class="bi bi-shield-lock"></i> Quản lý tài khoản</a>
+        </li>
+        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Employee" ? "active" : "")">
+            <a asp-controller="Employee" asp-action="Index"><i class="bi bi-people"></i> Quản lý nhân viên</a>
+        </li>
+    }
+
+    @* 4. DÙNG CHUNG: Luôn hiện *@
+    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Report" ? "active" : "")">
+        <a asp-controller="Report" asp-action="Monthly"><i class="bi bi-graph-up"></i> Thống kê</a>
+    </li>
+    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Account" ? "active" : "")">
+        <a asp-controller="Account" asp-action="Index"><i class="bi bi-person-circle"></i> Tài khoản</a>
+    </li>
+</ul>
+
+            <div class="mt-auto p-3">
+                <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-danger w-100">Đăng xuất</a>
+            </div>
+        </nav>
+
+        <div id="content">
+            <div class="top-info">
+                <div><i class="bi bi-list"></i> Siêu Thị Ánh Dương</div>
+                <div>
+                    <span class="me-3">@DateTime.Now.ToString("dd/MM/yyyy")</span>
+                    <i class="bi bi-person-circle"></i> 
+                    @(User.Identity.IsAuthenticated ? (User.FindFirst("FullName")?.Value ?? User.Identity.Name) : "Khách")
+                </div>
+            </div>
+            @RenderBody()
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

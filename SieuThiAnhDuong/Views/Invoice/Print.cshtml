@@ -1,0 +1,71 @@
+﻿@model SieuThiAnhDuong.Models.HoaDon
+
+@{
+    Layout = null; 
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>In Hóa Đơn Ánh Dương</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body { background-color: #f8f9fa; padding: 50px; }
+        .invoice-card { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 800px; margin: auto; }
+        
+     
+        @@media print {
+            .no-print { display: none !important; }
+            body { background-color: #fff; padding: 0; }
+            .invoice-card { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="invoice-card">
+    <div class="no-print d-flex justify-content-between mb-4">
+        <a href="/Invoice/Create" class="btn btn-outline-secondary">← Quay lại bán hàng</a>
+        <button onclick="window.print()" class="btn btn-primary">🖨️ In Hóa Đơn</button>
+    </div>
+
+    <div class="text-center">
+        <h2 class="fw-bold">HÓA ĐƠN BÁN LẺ</h2>
+        <p>Mã số: #@Model.MaHD | Ngày: @Model.NgayLap.ToString("dd/MM/yyyy")</p>
+    </div>
+
+    <hr />
+
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th class="text-center">SL</th>
+                <th class="text-end">Đơn giá</th>
+                <th class="text-end">Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.ChiTietHoaDons != null)
+            {
+                foreach (var item in Model.ChiTietHoaDons)
+                {
+                    <tr>
+                        <td>@(item.SanPham?.TenSP ?? "Sản phẩm")</td>
+                        <td class="text-center">@item.SoLuong</td>
+                        <td class="text-end">@item.DonGia.ToString("N0")</td>
+                        <td class="text-end">@((item.SoLuong * item.DonGia).ToString("N0")) đ</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <div class="text-end mt-4">
+        <h4>Tổng cộng: <span class="text-danger">@Model.TongTien.ToString("N0") VNĐ</span></h4>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+﻿@model SieuThiAnhDuong.Models.SanPham
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0 col-md-8 mx-auto">
+        <div class="card-header bg-success text-white py-3">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i>THÊM MẶT HÀNG MỚI</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="All" class="text-danger mb-3 small"></div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tên sản phẩm</label>
+                    <input asp-for="TenSP" class="form-control" placeholder="Nhập tên sản phẩm mới..." required />
+                    <span asp-validation-for="TenSP" class="text-danger small"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Giá bán (đ)</label>
+                        @* Chặn số âm bằng min="0" *@
+                        <input asp-for="GiaBan" type="number" min="0" step="any" class="form-control" placeholder="0" required />
+                        <span asp-validation-for="GiaBan" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Số lượng tồn kho ban đầu</label>
+                        @* Đổi thành TonKho và thêm min="0" *@
+                        <input asp-for="SoLuongTon" type="number" min="0" class="form-control" placeholder="0" required />
+                        <span asp-validation-for="SoLuongTon" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Đơn vị tính</label>
+                    @* Đổi thành DonVi *@
+                    <input asp-for="DonViTinh" class="form-control" placeholder="Gói, Chai, Cái, Kg..." required />
+                    <span asp-validation-for="DonViTinh" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Hủy bỏ
+                    </a>
+                    <button type="submit" class="btn btn-success px-4 shadow-sm">
+                        <i class="bi bi-check-lg me-1"></i> Lưu sản phẩm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
