@@ -42,17 +42,18 @@
                             <td class="fw-bold">@item.TenDangNhap</td>
                             <td>@item.MaNV - @(item.NhanVien?.HoTen)</td>
                             <td>
-                                @* Hiển thị Badge màu sắc theo chức vụ *@
                                 @if (item.NhanVien?.ChucVu == "Admin")
                                 {
                                     <span class="badge bg-danger">Admin</span>
                                 }
                                 else if (item.NhanVien?.ChucVu == "Thủ kho")
                                 {
+
                                     <span class="badge bg-info">Thủ kho</span>
                                 }
                                 else
                                 {
+
                                     <span class="badge bg-primary">Nhân viên</span>
                                 }
                             </td>
@@ -66,13 +67,11 @@
                                         </button>
                                     </form>
 
-                                    @* CHẶN XÓA NẾU LÀ ADMIN *@
                                     @if (item.TenDangNhap.ToLower() != "admin")
                                     {
-                                        <form asp-action="Delete" method="post">
+                                        <form asp-action="Delete" method="post" onsubmit="return confirm('Xác nhận xóa tài khoản này?')">
                                             <input type="hidden" name="id" value="@item.TenDangNhap" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                    onclick="return confirm('Xác nhận xóa tài khoản này?')">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -93,4 +92,36 @@
     </div>
 </div>
 
-@* Modal Cấp tài khoản mới giữ nguyên *@
+<div class="modal fade" id="createAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Cấp tài khoản mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Chọn nhân viên</label>
+                        <select name="MaNV" class="form-select" asp-items="ViewBag.MaNV" required>
+                            <option value="">-- Chọn nhân viên --</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tên đăng nhập</label>
+                        <input name="TenDangNhap" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mật khẩu</label>
+                        <input name="MatKhau" type="password" class="form-control" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu tài khoản</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
