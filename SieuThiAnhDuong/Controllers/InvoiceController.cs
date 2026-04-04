@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SieuThiAnhDuong.Data;
 using SieuThiAnhDuong.Models;
-using System.Security.Claims; // Cần dòng này để lấy thông tin User
+using System.Security.Claims; 
 
 namespace SieuThiAnhDuong.Controllers
 {

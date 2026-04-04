@@ -9,7 +9,6 @@ namespace SieuThiAnhDuong.Controllers
         private readonly ApplicationDbContext _context;
         public ReportController(ApplicationDbContext context) => _context = context;
 
-        // Trang danh sách tổng quát
         public async Task<IActionResult> Monthly(string searchString, DateTime? searchDate)
         {
        
