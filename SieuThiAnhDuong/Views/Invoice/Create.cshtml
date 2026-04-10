@@ -15,7 +15,7 @@
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white py-3">
                 <h4 class="mb-0 text-primary"><i class="bi bi-search me-2"></i>Chọn sản phẩm</h4>
-                <div class="mb-3">
+                <div class="mt-3">
                     <div class="input-group">
                         <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
                         <input type="text" id="searchProduct" class="form-control" placeholder="Nhập tên sản phẩm để tìm nhanh...">
@@ -45,7 +45,6 @@
                                     </span>
                                 </td>
                                 <td>
-                                    
                                     <input type="number" id="qty-@p.MaSP"
                                            value="@(p.SoLuongTon > 0 ? 1 : 0)"
                                            min="0"
@@ -76,14 +75,25 @@
                 <h4 class="mb-0"><i class="bi bi-cart3 me-2"></i>Giỏ hàng</h4>
             </div>
             <div class="card-body">
-                <ul id="cart" class="list-group list-group-flush mb-3" style="min-height: 200px; max-height: 400px; overflow-y: auto;">
+                <ul id="cart" class="list-group list-group-flush mb-3" style="min-height: 150px; max-height: 350px; overflow-y: auto;">
                     <li class="text-muted text-center py-4">Chưa có sản phẩm nào</li>
                 </ul>
                 <hr>
+                
+                @* PHẦN THÊM MỚI: CHỌN PHƯƠNG THỨC THANH TOÁN *@
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark"><i class="bi bi-credit-card-2-back me-1"></i> Phương thức thanh toán:</label>
+                    <select id="phuongThucThanhToan" class="form-select border-success">
+                        <option value="Tiền mặt">💵 Tiền mặt</option>
+                        <option value="Chuyển khoản">💳 Chuyển khoản</option>
+                    </select>
+                </div>
+
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <span class="h5 mb-0">Tổng cộng:</span>
                     <span class="h4 mb-0 text-danger fw-bold"><span id="totalAmount">0</span> đ</span>
                 </div>
+                
                 <button onclick="finishOrder()" class="btn btn-success w-100 py-3 fw-bold shadow-sm">
                     <i class="bi bi-printer me-2"></i> THANH TOÁN & IN HÓA ĐƠN
                 </button>
@@ -100,20 +110,17 @@
         let btnAdd = document.getElementById('btn-add-' + id);
         let currentVal = parseInt(qtyInput.value);
 
-        
         if (currentVal < 0 || isNaN(currentVal)) {
             qtyInput.value = 0;
             currentVal = 0;
         }
 
-        
         if (currentVal > maxStock) {
             alert("Số lượng tồn kho không đủ! (Tối đa: " + maxStock + ")");
             qtyInput.value = maxStock;
             currentVal = maxStock;
         }
 
-        
         if (currentVal === 0) {
             btnAdd.disabled = true;
             btnAdd.classList.replace('btn-primary', 'btn-secondary');
@@ -123,14 +130,12 @@
         }
     }
 
-    
     function addToCart(id, name, price, maxStock) {
         let qtyInput = document.getElementById('qty-' + id);
         let qty = parseInt(qtyInput.value);
 
         if (isNaN(qty) || qty <= 0) return;
 
-       
         let existingItem = cart.find(item => item.maSP === id);
         let totalInCart = (existingItem ? existingItem.soLuong : 0) + qty;
 
@@ -145,13 +150,11 @@
             cart.push({ maSP: id, ten: name, soLuong: qty, donGia: price });
         }
 
-       
         qtyInput.value = (maxStock > 0) ? 1 : 0;
         checkQty(id, maxStock);
         renderCart();
     }
 
-    
     function renderCart() {
         let html = '';
         let total = 0;
@@ -183,7 +186,6 @@
         renderCart();
     }
 
-   
     function finishOrder() {
         if (cart.length === 0) {
             alert("Giỏ hàng đang trống!");
@@ -194,11 +196,12 @@
         form.method = "POST";
         form.action = "/Invoice/Create";
 
-        let inputMaNV = document.createElement("input");
-        inputMaNV.type = "hidden";
-        inputMaNV.name = "maNV";
-        inputMaNV.value = "@(User.FindFirst("MaNV")?.Value ?? "1")";
-        form.appendChild(inputMaNV);
+        // Gửi phương thức thanh toán đã chọn
+        let ptThanhToan = document.getElementById("phuongThucThanhToan").value;
+        appendHiddenInput(form, "phuongThucThanhToan", ptThanhToan);
+
+        // Các dữ liệu khác
+        appendHiddenInput(form, "__RequestVerificationToken", document.querySelector('input[name="__RequestVerificationToken"]')?.value || "");
 
         cart.forEach((item, i) => {
             appendHiddenInput(form, `details[${i}].MaSP`, item.maSP);
@@ -218,18 +221,14 @@
         form.appendChild(input);
     }
 </script>
+
 @section Scripts {
     <script>
-       
         document.getElementById('searchProduct').addEventListener('keyup', function () {
             var searchValue = this.value.toLowerCase();
             var tableRows = document.querySelectorAll('#productList tr');
-
             tableRows.forEach(function (row) {
-                
                 var productName = row.cells[0].textContent.toLowerCase();
-                
-               
                 if (productName.includes(searchValue)) {
                     row.style.display = '';
                 } else {

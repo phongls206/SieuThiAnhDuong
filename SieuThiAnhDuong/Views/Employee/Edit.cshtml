@@ -12,36 +12,45 @@
                         @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="MaNV" />
 
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
                         <div class="mb-3">
                             <label class="form-label fw-bold">Họ và tên</label>
-                            <input asp-for="HoTen" class="form-control" placeholder="Nhập họ tên nhân viên" required />
+                            <input asp-for="HoTen" class="form-control" placeholder="Nhập họ tên nhân viên" />
                             <span asp-validation-for="HoTen" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Chức vụ</label>
-                            <select asp-for="ChucVu" class="form-control">
+                            <select asp-for="ChucVu" class="form-select border-primary">
                                 <option value="Admin">Admin</option>
                                 <option value="Thủ kho">Thủ kho</option>
                                 <option value="Nhân viên">Nhân viên</option>
                             </select>
+                            <span asp-validation-for="ChucVu" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Số điện thoại</label>
-                            <input asp-for="SoDT" class="form-control" placeholder="Nhập số điện thoại" />
+                            <input asp-for="SoDT" class="form-control"
+                                   maxlength="10"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                                   placeholder="Nhập đủ 10 chữ số..." />
                             <span asp-validation-for="SoDT" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Địa chỉ</label>
-                            <textarea asp-for="DiaChi" class="form-control" rows="2"></textarea>
+                            <textarea asp-for="DiaChi" class="form-control" rows="2" placeholder="Địa chỉ thường trú..."></textarea>
+                            <span asp-validation-for="DiaChi" class="text-danger"></span>
                         </div>
 
                         <hr />
                         <div class="d-flex justify-content-end gap-2">
                             <a asp-action="Index" class="btn btn-light border">Hủy bỏ</a>
-                            <button type="submit" class="btn btn-primary px-4">Lưu thay đổi</button>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold">
+                                <i class="bi bi-save me-1"></i> Lưu thay đổi
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -55,4 +64,3 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-<div asp-validation-summary="All" class="text-danger"></div>

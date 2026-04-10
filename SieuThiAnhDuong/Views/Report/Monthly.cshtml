@@ -1,29 +1,40 @@
 ﻿@model IEnumerable<SieuThiAnhDuong.Models.HoaDon>
-
 <div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-primary"><i class="bi bi-graph-up"></i> Báo cáo & Thống kê</h3>
+    </div>
+
     <div class="row mb-4">
         <div class="col-md-3">
-            <div class="card shadow-sm border-0 bg-primary text-white p-3">
-                <small>Tổng số hóa đơn</small>
-                <h3 class="fw-bold">@ViewBag.SoHoaDon</h3>
+            <div class="card shadow-sm border-0 bg-primary text-white p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><small class="opacity-75">Số lượng hóa đơn</small><h3 class="fw-bold mb-0">@ViewBag.SoHoaDon</h3></div>
+                    <i class="bi bi-receipt fs-1 opacity-50"></i>
+                </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card shadow-sm border-0 bg-success text-white p-3">
-                <small>Tổng doanh thu</small>
-                <h3 class="fw-bold">@ViewBag.TongDoanhThu.ToString("N0") đ</h3>
+            <div class="card shadow-sm border-0 bg-success text-white p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><small class="opacity-75">Doanh thu tổng</small><h3 class="fw-bold mb-0">@ViewBag.TongDoanhThu.ToString("N0") đ</h3></div>
+                    <i class="bi bi-wallet2 fs-1 opacity-50"></i>
+                </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card shadow-sm border-0 bg-info text-white p-3">
-                <small>Số hóa đơn hôm nay</small>
-                <h3 class="fw-bold">@ViewBag.HoaDonHomNay</h3>
+            <div class="card shadow-sm border-0 bg-info text-white p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><small class="opacity-75">Tổng tiền mặt</small><h3 class="fw-bold mb-0">@ViewBag.TienMat.ToString("N0") đ</h3></div>
+                    <i class="bi bi-cash-stack fs-1 opacity-50"></i>
+                </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card shadow-sm border-0 bg-warning text-white p-3">
-                <small>Tổng tiền hôm nay</small>
-                <h3 class="fw-bold">@ViewBag.DoanhThuHomNay.ToString("N0") đ</h3>
+            <div class="card shadow-sm border-0 bg-warning text-white p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><small class="opacity-75">Chuyển khoản</small><h3 class="fw-bold mb-0">@ViewBag.Banking.ToString("N0") đ</h3></div>
+                    <i class="bi bi-credit-card fs-1 opacity-50"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -31,55 +42,174 @@
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
             <form asp-action="Monthly" method="get" class="row g-3">
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                        <input type="text" name="searchString" class="form-control" placeholder="Tìm theo tên nhân viên...">
-                    </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-primary">Nhân viên</label>
+                    @if (User.FindFirst("Quyen")?.Value == "Admin")
+                    {
+                        <select name="selectNV" class="form-select border-primary shadow-sm">
+                            <option value="">-- Tất cả nhân viên --</option>
+                            @foreach (var nv in ViewBag.NhanVienList)
+                            {
+                                <option value="@nv.MaNV" selected="@(ViewBag.CurrentNV == nv.MaNV)">@nv.HoTen</option>
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <input type="text" class="form-control bg-light" value="@User.Identity.Name" readonly>
+                    }
                 </div>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white"><i class="bi bi-calendar3"></i></span>
-                        <input type="date" name="searchDate" class="form-control">
-                    </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-primary">Ngày cần xem</label>
+                    <input type="date" name="searchDate" class="form-control shadow-sm" value="@ViewBag.CurrentDate">
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Lọc dữ liệu</button>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-primary">Ca trực cửa hàng</label>
+                    <select name="selectCa" class="form-select shadow-sm">
+                        <option value="">-- Tất cả ca --</option>
+                        <option value="Ca 1 (Sáng)" selected="@(ViewBag.CurrentCa == "Ca 1 (Sáng)")">Ca 1 (7:00 - 14:30)</option>
+                        <option value="Ca 2 (Chiều)" selected="@(ViewBag.CurrentCa == "Ca 2 (Chiều)")">Ca 2 (14:30 - 22:00)</option>
+                    </select>
                 </div>
-                <div class="col-md-2">
-                    <a asp-action="Monthly" class="btn btn-outline-secondary w-100">Làm mới</a>
+                <div class="col-md-3 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1 fw-bold shadow-sm">
+                        <i class="bi bi-funnel-fill me-2"></i>LỌC DỮ LIỆU
+                    </button>
+                    <a asp-action="Monthly" class="btn btn-outline-secondary shadow-sm"><i class="bi bi-arrow-clockwise"></i></a>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="ps-4">Mã HD</th>
-                        <th>Ngày Bán</th>
-                        <th>Tên Nhân Viên</th>
-                        <th class="text-end">Tổng Tiền</th>
-                        <th class="text-center">Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td class="ps-4 fw-bold">#@item.MaHD</td>
-                            <td>@item.NgayLap.ToString("dd/MM/yyyy")</td>
-                            <td>@item.NhanVien?.HoTen</td>
-                            <td class="text-end fw-bold text-danger">@item.TongTien.ToString("N0") đ</td>
-                            <td class="text-center">
-                                <a asp-action="Details" asp-route-id="@item.MaHD" class="btn btn-sm btn-outline-info">Chi tiết</a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+    <div class="card shadow-sm border-0 mb-5">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-secondary" style="font-weight: 900 !important;">
+                <i class="bi bi-table me-2"></i> Chi tiết các đơn hàng
+            </h5>
+            <small class="text-muted">Trang @ViewBag.CurrentPage / @ViewBag.TotalPages</small>
         </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark text-white">
+                        <tr>
+                            <th class="ps-4">Mã đơn</th>
+                            <th>Ngày & Giờ lập</th>
+                            <th>Người bán hàng</th>
+                            <th class="text-center">Ca làm</th>
+                            <th class="text-center">Hình thức</th>
+                            <th class="text-end">Thành tiền</th>
+                            <th class="text-center pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold">#@item.MaHD</td>
+                                <td>
+                                    <div class="fw-bold">@item.NgayLap.ToString("dd/MM/yyyy")</div>
+                                    <div class="text-muted small">@item.NgayLap.ToString("HH:mm:ss")</div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold">@item.NhanVien?.HoTen</div>
+                                    <div class="text-muted small">Mã NV: @item.MaNV</div>
+                                </td>
+                                <td class="text-center">
+                                    @if (item.CaTruc?.Contains("1") == true)
+                                    {
+                                        <span class="badge bg-info text-white px-3 py-2">@item.CaTruc</span>
+                                    }
+                                    else if (item.CaTruc?.Contains("2") == true)
+                                    {
+                                        <span class="badge bg-warning text-dark px-3 py-2">@item.CaTruc</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary text-white px-3 py-2">N/A</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    @if (item.PhuongThucThanhToan == "Tiền mặt")
+                                    {
+                                        <span class="badge border text-dark fw-normal py-2"><i class="bi bi-cash me-1 text-success"></i>Tiền mặt</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge border text-dark fw-normal py-2"><i class="bi bi-credit-card me-1 text-primary"></i>Chuyển khoản</span>
+                                    }
+                                </td>
+                                <td class="text-end fw-bold text-danger">@item.TongTien.ToString("N0") đ</td>
+                                <td class="text-center pe-4">
+                                    <a asp-action="Details" asp-route-id="@item.MaHD" class="btn btn-outline-primary btn-sm rounded-circle shadow-sm">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (ViewBag.TotalPages > 1)
+        {
+            <div class="card-footer bg-white py-3">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center mb-0">
+                        @* Nút Về đầu/Trước *@
+                        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link shadow-sm" href="@Url.Action("Monthly", new { page = 1, selectNV = ViewBag.CurrentNV, searchDate = ViewBag.CurrentDate, selectCa = ViewBag.CurrentCa, searchString = ViewBag.CurrentSearch })">
+                                <i class="bi bi-chevron-double-left"></i>
+                            </a>
+                        </li>
+
+                        @* Hiển thị danh sách số trang *@
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            // Logic chỉ hiển thị vài trang xung quanh trang hiện tại để tránh bị quá dài
+                            if (i == 1 || i == ViewBag.TotalPages || (i >= ViewBag.CurrentPage - 2 && i <= ViewBag.CurrentPage + 2))
+                            {
+                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                    <a class="page-link shadow-sm" href="@Url.Action("Monthly", new { page = i, selectNV = ViewBag.CurrentNV, searchDate = ViewBag.CurrentDate, selectCa = ViewBag.CurrentCa, searchString = ViewBag.CurrentSearch })">@i</a>
+                                </li>
+                            }
+                            else if (i == ViewBag.CurrentPage - 3 || i == ViewBag.CurrentPage + 3)
+                            {
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            }
+                        }
+
+                        @* Nút Tiếp/Cuối *@
+                        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                            <a class="page-link shadow-sm" href="@Url.Action("Monthly", new { page = ViewBag.TotalPages, selectNV = ViewBag.CurrentNV, searchDate = ViewBag.CurrentDate, selectCa = ViewBag.CurrentCa, searchString = ViewBag.CurrentSearch })">
+                                <i class="bi bi-chevron-double-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
     </div>
 </div>
+
+<style>
+    /* Tùy chỉnh nhẹ cho nút phân trang giống phong cách Dashboard */
+    .pagination .page-link {
+        border: none;
+        margin: 0 3px;
+        border-radius: 8px !important;
+        color: #666;
+        font-weight: 600;
+        padding: 8px 14px;
+    }
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        box-shadow: 0 4px 10px rgba(0,123,255,0.3);
+    }
+    .pagination .page-item.disabled .page-link {
+        background: #f8f9fa;
+        color: #ccc;
+    }
+</style>

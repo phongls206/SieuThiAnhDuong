@@ -22,6 +22,7 @@ namespace SieuThiAnhDuong.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
+            // Tìm user trong DB
             var user = await _context.TaiKhoans
                 .Include(t => t.NhanVien)
                 .FirstOrDefaultAsync(u => u.TenDangNhap == model.Username && u.MatKhau == model.Password);
@@ -30,17 +31,27 @@ namespace SieuThiAnhDuong.Controllers
             {
                 string chucVuThucTe = user.NhanVien?.ChucVu ?? "Nhân viên";
 
+                // TẠO BỘ NHỚ COOKIE CHO USER
                 var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.TenDangNhap),
-            new Claim(ClaimTypes.Role, chucVuThucTe),
-            new Claim("ChucVu", chucVuThucTe),
-            new Claim("FullName", user.NhanVien?.HoTen ?? user.TenDangNhap),
-            new Claim("MaNV", user.MaNV.ToString())
-        };
+                {
+                    new Claim(ClaimTypes.Name, user.TenDangNhap),
+                    new Claim(ClaimTypes.Role, chucVuThucTe),
+                    new Claim("ChucVu", chucVuThucTe),
+                    new Claim("FullName", user.NhanVien?.HoTen ?? user.TenDangNhap),
+                    new Claim("MaNV", user.MaNV.ToString()),
+
+                    // 👇 DÒNG QUYẾT ĐỊNH ĐÂY: BẮT BUỘC PHẢI THÊM VÀO 👇
+                    // Giả sử bảng TaiKhoan của bạn có cột Quyen lưu chữ "Admin"
+                    new Claim("Quyen", user.Quyen ?? "Nhân viên")
+                };
+
+                // LƯU Ý NHỎ: Nếu Database của bạn không có cột "Quyen" mà bạn phân quyền Admin
+                // dựa vào cột "ChucVu" của nhân viên, thì thay dòng trên bằng dòng này:
+                // new Claim("Quyen", chucVuThucTe == "Quản trị viên" ? "Admin" : "Nhân viên")
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity),

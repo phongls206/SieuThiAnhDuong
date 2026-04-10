@@ -1,6 +1,4 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
+﻿<!DOCTYPE html><html lang="en"><head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Siêu thị Ánh Dương - Quản lý</title>
@@ -9,57 +7,135 @@
     <style>
         body { overflow-x: hidden; background-color: #f4f7f6; }
         .wrapper { display: flex; width: 100%; align-items: stretch; height: 100vh; }
-        #sidebar { min-width: 250px; max-width: 250px; background: #ffffff; color: #333; transition: all 0.3s; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        
+        /* Sidebar Styles */
+        #sidebar { 
+            min-width: 250px; 
+            max-width: 250px; 
+            background: #ffffff; 
+            color: #333; 
+            transition: all 0.3s ease; 
+            border-right: 1px solid #ddd; 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        #sidebar.active { margin-left: -250px; }
         #sidebar .sidebar-header { padding: 20px; text-align: center; background: #fff; }
-        #sidebar .logo { width: 200px; height: auto; margin-bottom: 10px; }
+        #sidebar .logo { width: 180px; height: auto; margin-bottom: 10px; }
         #sidebar ul.components { padding: 20px 0; }
-        #sidebar ul li a { padding: 15px 25px; display: block; color: #333; text-decoration: none; font-weight: 500; }
-        #sidebar ul li a:hover { background: #e9ecef; color: #007bff; }
-        #sidebar ul li.active > a { background: #007bff; color: #fff; }
-        #sidebar ul li i { margin-right: 10px; font-size: 1.2rem; }
-        #content { width: 100%; padding: 20px; overflow-y: auto; background-color: #fff; }
-        .top-info { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #00bfff; color: white; margin: -20px -20px 20px -20px; }
-    </style>
-</head>
-<body>
+        #sidebar ul li a { padding: 12px 25px; display: block; color: #333; text-decoration: none; font-weight: 500; transition: 0.2s; }
+        #sidebar ul li a:hover { background: #f8f9fa; color: #007bff; padding-left: 30px; }
+        #sidebar ul li.active > a { background: #e7f1ff; color: #007bff; border-right: 4px solid #007bff; }
+        #sidebar ul li i { margin-right: 10px; font-size: 1.1rem; }
+        
+        /* Content & Header Styles */
+        #content { width: 100%; padding: 20px; overflow-y: auto; background-color: #fff; position: relative; transition: all 0.3s ease; }
+        
+        .top-info { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0 20px; 
+            background: #00bfff; 
+            color: white; 
+            margin: -20px -20px 20px -20px; 
+            height: 65px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .menu-side { cursor: pointer; font-size: 1.5rem; padding: 5px; flex-shrink: 0; transition: 0.3s; }
+        .menu-side:hover { transform: scale(1.1); }
+
+        .announcement-bar {
+            flex-grow: 1; 
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            padding: 8px 0;
+            margin: 0 25px;
+        }
+
+        .scrolling-text {
+            display: inline-block;
+            animation: marqueeLeft 25s linear infinite;
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        @@keyframes marqueeLeft {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* --- USER SIDE CẢI TIẾN --- */
+        .user-side { 
+            flex-shrink: 0; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+        }
+
+        .user-chip {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 4px 4px 15px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: 0.3s;
+            cursor: pointer; /* Thêm con trỏ tay */
+        }
+
+        .user-chip:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .user-avatar-nav {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+            margin-left: 10px;
+        }
+
+        /* Đảm bảo link không đổi màu chữ */
+        .user-link {
+            text-decoration: none !important;
+            color: inherit !important;
+        }
+    </style></head><body>
     @{
         var chucVu = User.FindFirst("ChucVu")?.Value ?? "";
         var controller = ViewContext.RouteData.Values["Controller"]?.ToString();
+        var fullName = User.Identity.IsAuthenticated ? (User.FindFirst("FullName")?.Value ?? User.Identity.Name) : "Khách";
     }
 
     <div class="wrapper">
         <nav id="sidebar">
-            <div class="sidebar-header">
+            <div class="sidebar-header border-bottom">
                 <img src="~/images/logo.png" class="logo" alt="Logo">
-                <h5 class="fw-bold mt-2 text-primary">ÁNH DƯƠNG MART</h5>
+                <h6 class="fw-bold text-primary mb-0">ÁNH DƯƠNG MART</h6>
             </div>
 
-            <ul class="list-unstyled components">
-                @* 1. BÁN HÀNG *@
-                @if (chucVu == "Admin" || chucVu == "Nhân viên")
-                {
+            <ul class="list-unstyled components mb-auto">
+                @if (chucVu == "Admin" || chucVu == "Nhân viên") {
                     <li class="@(controller == "Invoice" ? "active" : "")">
                         <a asp-controller="Invoice" asp-action="Create"><i class="bi bi-cart4"></i> Bán hàng</a>
                     </li>
                 }
-                   @* 3. THỐNG KÊ (Đã sửa action thành Monthly) *@
                 <li class="@(controller == "Report" ? "active" : "")">
                     <a asp-controller="Report" asp-action="Monthly"><i class="bi bi-graph-up"></i> Thống kê</a>
                 </li>
-
-                @* 2. QUẢN LÝ HÀNG HÓA *@
-                @if (chucVu == "Admin" || chucVu == "Thủ kho")
-                {
+                @if (chucVu == "Admin" || chucVu == "Thủ kho") {
                     <li class="@(controller == "Product" ? "active" : "")">
                         <a asp-controller="Product" asp-action="Index"><i class="bi bi-box-seam"></i> Quản lý hàng hóa</a>
                     </li>
                 }
-
-             
-
-                @* 4. QUẢN TRỊ *@
-                @if (chucVu == "Admin")
-                {
+                @if (chucVu == "Admin") {
                     <li class="@(controller == "UserAccount" ? "active" : "")">
                         <a asp-controller="UserAccount" asp-action="Index"><i class="bi bi-shield-lock"></i> Quản lý tài khoản</a>
                     </li>
@@ -67,33 +143,55 @@
                         <a asp-controller="Employee" asp-action="Index"><i class="bi bi-people"></i> Quản lý nhân viên</a>
                     </li>
                 }
-
-                @* 5. TÀI KHOẢN *@
                 <li class="@(controller == "Account" ? "active" : "")">
                     <a asp-controller="Account" asp-action="Index"><i class="bi bi-person-circle"></i> Tài khoản</a>
                 </li>
             </ul>
-
-            <div class="mt-auto p-3">
-                <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-danger w-100">Đăng xuất</a>
+            
+            <div class="p-3 border-top"> 
+                <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-danger w-100 btn-sm">
+                    <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
+                </a>
             </div>
         </nav>
 
         <div id="content">
             <div class="top-info">
-                <div><i class="bi bi-list"></i> Siêu Thị Ánh Dương</div>
-                <div>
-                    <span class="me-3">@DateTime.Now.ToString("dd/MM/yyyy")</span>
-                    <i class="bi bi-person-circle"></i> 
-                    @(User.Identity.IsAuthenticated ? (User.FindFirst("FullName")?.Value ?? User.Identity.Name) : "Khách")
+                <div class="menu-side" id="sidebarCollapse">
+                    <i class="bi bi-list"></i> 
+                </div>
+
+                <div class="announcement-bar d-none d-md-block">
+                    <div class="scrolling-text">
+                        <i class="bi bi-megaphone-fill me-2"></i> Chào mừng bạn đến với <strong>Siêu Thị Ánh Dương</strong>, chúc bạn làm việc vui vẻ và hiệu quả!
+                    </div>
+                </div>
+
+                <div class="user-side">
+                    <span class="small d-none d-lg-inline opacity-75">@DateTime.Now.ToString("dd/MM/yyyy")</span>
+                    
+                    @* Thêm link bao quanh user-chip *@
+                    <a asp-controller="Account" asp-action="Index" class="user-link">
+                        <div class="user-chip">
+                            <span class="fw-bold small">@fullName</span>
+                            <img src="https://ui-avatars.com/api/?name=@fullName&background=6f42c1&color=fff&size=64" 
+                                 class="user-avatar-nav" alt="Avatar">
+                        </div>
+                    </a>
                 </div>
             </div>
+
             @RenderBody()
         </div>
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
-</html>
+    <script>
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)</body></html>

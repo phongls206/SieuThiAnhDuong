@@ -12,29 +12,31 @@ namespace SieuThiAnhDuong.Controllers
 
         public async Task<IActionResult> Index() => View(await _context.NhanViens.ToListAsync());
 
-       
         public IActionResult Create() => View();
 
-        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(NhanVien nhanVien)
         {
-            try
+            // Kiểm tra hợp lệ từ Model (10 số điện thoại, không để trống...)
+            if (ModelState.IsValid)
             {
-                _context.Add(nhanVien);
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Thêm nhân viên thành công!";
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(nhanVien);
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = "Thêm nhân viên thành công!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception)
+                {
+                    // FIX TẠI ĐÂY: Bỏ ex.Message để không hiện tiếng Anh
+                    ModelState.AddModelError("", "Không thể thêm nhân viên. Vui lòng kiểm tra lại dữ liệu!");
+                }
             }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Không thể thêm nhân viên: " + ex.Message);
-                return View(nhanVien);
-            }
+            return View(nhanVien);
         }
 
-        
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -45,7 +47,6 @@ namespace SieuThiAnhDuong.Controllers
             return View(nhanVien);
         }
 
-        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("MaNV,HoTen,ChucVu,SoDT,DiaChi")] NhanVien nhanVien)
@@ -64,20 +65,19 @@ namespace SieuThiAnhDuong.Controllers
                     TempData["Success"] = "Cập nhật thành công!";
                     return RedirectToAction(nameof(Index));
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    ModelState.AddModelError("", "Lỗi: " + ex.Message);
+                    // FIX TẠI ĐÂY: Bỏ ex.Message để không hiện tiếng Anh
+                    ModelState.AddModelError("", "Không thể cập nhật thông tin nhân viên!");
                 }
             }
             return View(nhanVien);
         }
 
-      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-    
             if (id == 1)
             {
                 TempData["Error"] = "Cảnh báo: Không thể xóa tài khoản Quản trị viên hệ thống!";
@@ -95,7 +95,7 @@ namespace SieuThiAnhDuong.Controllers
                 }
                 catch (Exception)
                 {
-                    TempData["Error"] = "Không thể xóa nhân viên này vì đang có dữ liệu liên quan (Hóa đơn/Tài khoản)!";
+                    TempData["Error"] = "Không thể xóa nhân viên này vì đang có dữ liệu liên quan!";
                 }
             }
             return RedirectToAction(nameof(Index));

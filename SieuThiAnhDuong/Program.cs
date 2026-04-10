@@ -18,6 +18,12 @@ namespace SieuThiAnhDuong
     .AddCookie(options => {
         options.LoginPath = "/Account/Login";
     });
+            builder.Services.AddControllersWithViews()
+    .AddMvcOptions(options => {
+        // Việt hóa lỗi sai định dạng dữ liệu (Invalid)
+        options.ModelBindingMessageProvider.SetValueIsInvalidAccessor((x) => $"Giá trị '{x}' không hợp lệ.");
+        options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor((x) => "Trường này không được để trống.");
+    });
             var app = builder.Build();
 
             if (!app.Environment.IsDevelopment())

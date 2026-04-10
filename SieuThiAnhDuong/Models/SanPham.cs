@@ -15,7 +15,8 @@ namespace SieuThiAnhDuong.Models
         public decimal GiaBan { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "Số lượng tồn phải từ 0 trở lên")]
         public int SoLuongTon { get; set; }
-
+        [Required(ErrorMessage = "Đơn vị tính không được để trống ")]
+      
         public string? DonViTinh { get; set; }
 
         [ValidateNever] 

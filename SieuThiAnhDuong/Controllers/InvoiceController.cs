@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SieuThiAnhDuong.Data;
 using SieuThiAnhDuong.Models;
-using System.Security.Claims; 
+using System.Security.Claims;
 
 namespace SieuThiAnhDuong.Controllers
 {
@@ -22,9 +22,8 @@ namespace SieuThiAnhDuong.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(List<ChiTietHoaDon> details)
+        public async Task<IActionResult> Create(List<ChiTietHoaDon> details, string phuongThucThanhToan)
         {
-            
             var maNVClaim = User.FindFirst("MaNV")?.Value;
             if (string.IsNullOrEmpty(maNVClaim))
             {
@@ -32,14 +31,13 @@ namespace SieuThiAnhDuong.Controllers
             }
             int idNhanVienDangLogin = int.Parse(maNVClaim);
 
-            
             if (details == null || !details.Any())
             {
                 TempData["Error"] = "Giỏ hàng đang trống!";
                 return RedirectToAction(nameof(Create));
             }
 
-            
+            // Kiểm tra tồn kho trước khi thanh toán
             foreach (var item in details)
             {
                 var product = await _context.SanPhams.AsNoTracking()
@@ -52,16 +50,36 @@ namespace SieuThiAnhDuong.Controllers
                 }
             }
 
-            
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
+                    // --- LOGIC PHÂN CA THEO KHUNG GIỜ 7H - 22H ---
+                    var bayGio = DateTime.Now;
+                    int gio = bayGio.Hour;
+                    int phut = bayGio.Minute;
+                    double thoiGianHienTai = gio + (phut / 60.0);
+
+                    string caTruc = "Ngoài giờ làm việc";
+
+                    // Ca 1: 07h00 - 14h30 (7.0 - 14.5)
+                    if (thoiGianHienTai >= 7 && thoiGianHienTai < 14.5)
+                    {
+                        caTruc = "Ca 1 (Sáng)";
+                    }
+                    // Ca 2: 14h30 - 22h00 (14.5 - 22.0)
+                    else if (thoiGianHienTai >= 14.5 && thoiGianHienTai <= 22)
+                    {
+                        caTruc = "Ca 2 (Chiều)";
+                    }
+
                     var invoice = new HoaDon
                     {
-                        NgayLap = DateTime.Now,
-                        MaNV = idNhanVienDangLogin, 
-                        TongTien = details.Sum(x => x.SoLuong * x.DonGia)
+                        NgayLap = bayGio,
+                        MaNV = idNhanVienDangLogin,
+                        TongTien = details.Sum(x => x.SoLuong * x.DonGia),
+                        CaTruc = caTruc,
+                        PhuongThucThanhToan = phuongThucThanhToan ?? "Tiền mặt"
                     };
 
                     _context.HoaDons.Add(invoice);
@@ -70,17 +88,18 @@ namespace SieuThiAnhDuong.Controllers
                     foreach (var item in details)
                     {
                         var product = await _context.SanPhams.FindAsync(item.MaSP);
-
-                        
-                        product.SoLuongTon -= item.SoLuong;
-
-                        _context.ChiTietHoaDons.Add(new ChiTietHoaDon
+                        if (product != null)
                         {
-                            MaHD = invoice.MaHD,
-                            MaSP = item.MaSP,
-                            SoLuong = item.SoLuong,
-                            DonGia = item.DonGia
-                        });
+                            product.SoLuongTon -= item.SoLuong;
+
+                            _context.ChiTietHoaDons.Add(new ChiTietHoaDon
+                            {
+                                MaHD = invoice.MaHD,
+                                MaSP = item.MaSP,
+                                SoLuong = item.SoLuong,
+                                DonGia = item.DonGia
+                            });
+                        }
                     }
 
                     await _context.SaveChangesAsync();
@@ -91,7 +110,7 @@ namespace SieuThiAnhDuong.Controllers
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    TempData["Error"] = "Lỗi hệ thống: " + ex.Message;
+                    TempData["Error"] = "Lỗi hệ thống: " + (ex.InnerException?.Message ?? ex.Message);
                     return RedirectToAction(nameof(Create));
                 }
             }
