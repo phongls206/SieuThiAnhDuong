@@ -171,13 +171,14 @@
                     <span class="small d-none d-lg-inline opacity-75">@DateTime.Now.ToString("dd/MM/yyyy")</span>
                     
                     @* Thêm link bao quanh user-chip *@
-                    <a asp-controller="Account" asp-action="Index" class="user-link">
-                        <div class="user-chip">
-                            <span class="fw-bold small">@fullName</span>
-                            <img src="https://ui-avatars.com/api/?name=@fullName&background=6f42c1&color=fff&size=64" 
-                                 class="user-avatar-nav" alt="Avatar">
-                        </div>
-                    </a>
+                 <a asp-controller="Account" asp-action="Index" class="user-link">
+    <div class="user-chip">
+        <span class="fw-bold small">@fullName</span>
+        @* Đã đổi background thành random để mỗi lần đăng nhập hoặc tải trang sẽ ra màu khác nhau *@
+        <img src="https://ui-avatars.com/api/?name=@fullName&background=random&color=fff&size=64" 
+             class="user-avatar-nav" alt="Avatar">
+    </div>
+</a>
                 </div>
             </div>
 
