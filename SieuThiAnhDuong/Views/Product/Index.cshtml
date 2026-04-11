@@ -34,7 +34,7 @@
                             <th class="ps-4" style="width: 100px;">Mã SP</th>
                             <th>Tên sản phẩm</th>
                             <th style="width: 150px;">Giá bán</th>
-                            <th style="width: 150px;">Tồn kho</th>
+                            <th style="width: 180px;">Tồn kho</th>
                             <th style="width: 120px;">Đơn vị</th>
                             <th class="text-center" style="width: 200px;">Thao tác</th>
                         </tr>
@@ -49,28 +49,22 @@
                                 </td>
                                 <td class="text-danger fw-bold">@item.GiaBan.ToString("N0") đ</td>
                                 <td>
-                                    @if (item.SoLuongTon < 0)
+                                    @if (item.SoLuongTon <= 0)
                                     {
                                         <span class="badge bg-danger shadow-sm py-2 px-3 w-100">
-                                            <i class="bi bi-exclamation-octagon me-1"></i> Lỗi âm (@item.SoLuongTon)
+                                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Hết hàng (@item.SoLuongTon)
                                         </span>
                                     }
-                                    else if (item.SoLuongTon == 0)
-                                    {
-                                        <span class="badge bg-secondary shadow-sm py-2 px-3 w-100">
-                                            Hết hàng
-                                        </span>
-                                    }
-                                    else if (item.SoLuongTon <= 10)
+                                    else if (item.SoLuongTon < 10)
                                     {
                                         <span class="badge bg-warning text-dark shadow-sm py-2 px-3 w-100">
-                                            Sắp hết (@item.SoLuongTon)
+                                            <i class="bi bi-hourglass-split me-1"></i> Sắp hết (@item.SoLuongTon)
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-light text-dark border shadow-sm py-2 px-3 w-100">
-                                            @item.SoLuongTon
+                                        <span class="badge bg-success shadow-sm py-2 px-3 w-100">
+                                            <i class="bi bi-check2-all me-1"></i> Còn hàng (@item.SoLuongTon)
                                         </span>
                                     }
                                 </td>
