@@ -14,10 +14,10 @@ namespace SieuThiAnhDuong.Models
 
 
         [Required(ErrorMessage = "Vui lòng chọn ngày sinh")]
+        [Display(Name = "Ngày sinh")]
         [DataType(DataType.Date)]
-        // Thêm dòng này để xử lý lỗi sai định dạng/trống
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-        public DateTime NgaySinh { get; set; }
+        public DateTime? NgaySinh { get; set; } // Đã thêm dấu ? để cho phép null
 
         [Required(ErrorMessage = "Địa chỉ không được để trống")]
         [StringLength(255, ErrorMessage = "Địa chỉ không được vượt quá 255 ký tự")]

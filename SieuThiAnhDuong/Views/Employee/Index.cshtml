@@ -3,22 +3,23 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold text-primary"><i class="bi bi-people"></i> Danh sách nhân viên</h3>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-person-plus"></i> + Thêm nhân viên mới
+        <a asp-action="Create" class="btn btn-success shadow-sm">
+            <i class="bi bi-person-plus"></i> Thêm nhân viên mới
         </a>
     </div>
 
+    @* Thông báo *@
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show">
-            @TempData["Success"]
+        <div class="alert alert-success alert-dismissible fade show shadow-sm">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show">
-            @TempData["Error"]
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
@@ -30,9 +31,10 @@
                     <tr>
                         <th>Mã NV</th>
                         <th>Họ tên</th>
-                        <th>Chức vụ</th>
+                        <th class="text-center">Ngày sinh</th>
                         <th>Số điện thoại</th>
                         <th>Địa chỉ</th>
+                        <th class="text-center">Chức vụ</th> @* Đã chuyển ra sau *@
                         <th class="text-center">Thao tác</th>
                     </tr>
                 </thead>
@@ -40,46 +42,59 @@
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td class="fw-bold">#@item.MaNV</td>
+                            <td class="fw-bold text-dark">#@item.MaNV</td>
                             <td>@item.HoTen</td>
-                            <td>
+                            <td class="text-center">
+                                <span class="text-muted small">
+                                    <i class="bi bi-calendar3 me-1"></i>
+                                    @if (item.NgaySinh.HasValue && item.NgaySinh.Value.Year > 1)
+                                    {
+                                        @item.NgaySinh.Value.ToString("dd/MM/yyyy")
+                                    }
+                                    else
+                                    {
+                                        <span class="fst-italic text-warning">Chưa cập nhật</span>
+                                    }
+                                </span>
+                            </td>
+                            <td>@item.SoDT</td>
+                            <td class="text-truncate" style="max-width: 200px;" title="@item.DiaChi">@item.DiaChi</td>
+                            
+                            @* Cột Chức vụ *@
+                            <td class="text-center">
                                 @if (item.ChucVu == "Admin")
                                 {
-                                    <span class="badge bg-danger">Admin</span>
+                                    <span class="badge bg-danger text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Admin</span>
                                 }
                                 else if (item.ChucVu == "Thủ kho")
                                 {
-
-                                    <span class="badge bg-info">Thủ kho</span>
+                                    <span class="badge bg-info text-dark text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Thủ kho</span>
                                 }
                                 else
                                 {
-
-                                    <span class="badge bg-primary">Nhân viên</span>
+                                    <span class="badge bg-primary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Nhân viên</span>
                                 }
                             </td>
-                            <td>@item.SoDT</td>
-                            <td>@item.DiaChi</td>
+
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-1">
-                                    <a asp-action="Edit" asp-route-id="@item.MaNV" class="btn btn-sm btn-outline-warning">
+                                    <a asp-action="Edit" asp-route-id="@item.MaNV" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
 
-                                   
                                     @if (item.MaNV != 1)
                                     {
                                         <form asp-action="Delete" method="post" onsubmit="return confirm('Xóa nhân viên này?')">
                                             <input type="hidden" name="id" value="@item.MaNV" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
                                     }
                                     else
                                     {
-                                        <button class="btn btn-sm btn-outline-secondary" disabled title="Không thể xóa Admin">
-                                            <i class="bi bi-trash"></i>
+                                        <button class="btn btn-sm btn-outline-secondary" disabled title="Bảo vệ hệ thống">
+                                            <i class="bi bi-shield-lock"></i>
                                         </button>
                                     }
                                 </div>

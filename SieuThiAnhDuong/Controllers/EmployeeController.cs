@@ -18,7 +18,10 @@ namespace SieuThiAnhDuong.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(NhanVien nhanVien)
         {
-            // Kiểm tra hợp lệ từ Model (10 số điện thoại, không để trống...)
+            // Loại bỏ các thuộc tính liên kết để không bị lỗi ModelState khi thêm mới
+            ModelState.Remove("TaiKhoan");
+            ModelState.Remove("HoaDons");
+
             if (ModelState.IsValid)
             {
                 try
@@ -30,7 +33,6 @@ namespace SieuThiAnhDuong.Controllers
                 }
                 catch (Exception)
                 {
-                    // FIX TẠI ĐÂY: Bỏ ex.Message để không hiện tiếng Anh
                     ModelState.AddModelError("", "Không thể thêm nhân viên. Vui lòng kiểm tra lại dữ liệu!");
                 }
             }
@@ -49,10 +51,12 @@ namespace SieuThiAnhDuong.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("MaNV,HoTen,ChucVu,SoDT,DiaChi")] NhanVien nhanVien)
+        // FIX: Đã thêm NgaySinh vào danh sách Bind để nhận dữ liệu từ Form gửi về
+        public async Task<IActionResult> Edit(int id, [Bind("MaNV,HoTen,NgaySinh,ChucVu,SoDT,DiaChi")] NhanVien nhanVien)
         {
             if (id != nhanVien.MaNV) return NotFound();
 
+            // Loại bỏ kiểm tra các thuộc tính navigation liên quan để ModelState.IsValid trả về true
             ModelState.Remove("TaiKhoan");
             ModelState.Remove("HoaDons");
 
@@ -67,10 +71,10 @@ namespace SieuThiAnhDuong.Controllers
                 }
                 catch (Exception)
                 {
-                    // FIX TẠI ĐÂY: Bỏ ex.Message để không hiện tiếng Anh
                     ModelState.AddModelError("", "Không thể cập nhật thông tin nhân viên!");
                 }
             }
+            // Nếu có lỗi (ModelState không hợp lệ), quay lại view cùng dữ liệu đã nhập để hiện lỗi validation
             return View(nhanVien);
         }
 
