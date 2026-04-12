@@ -36,6 +36,7 @@ namespace SieuThiAnhDuong
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
+            app.UseMiddleware<SessionCheckMiddleware>();
             app.UseAuthorization();
 
             app.MapStaticAssets();

@@ -14,8 +14,9 @@ namespace SieuThiAnhDuong.Models
         [StringLength(100)]
         [Display(Name = "Mật khẩu")]
         public string MatKhau { get; set; }
-
         
+
+
         [Display(Name = "Quyền hạn")]
         public string Quyen { get; set; }
 

@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SieuThiAnhDuong.Data;
+using SieuThiAnhDuong.Models; // Bắt buộc phải có để gọi class SessionControl
 using SieuThiAnhDuong.Models.ViewModels;
 using System.Security.Claims;
+using System; // Thêm thư viện này để dùng Guid
 
 namespace SieuThiAnhDuong.Controllers
 {
@@ -31,6 +33,16 @@ namespace SieuThiAnhDuong.Controllers
             {
                 string chucVuThucTe = user.NhanVien?.ChucVu ?? "Nhân viên";
 
+                // ==========================================
+                // [THÊM MỚI] - XỬ LÝ ĐÁ NGƯỜI DÙNG CŨ
+                // 1. Tạo mã phiên mới duy nhất cho lần đăng nhập này
+                string newSessionId = Guid.NewGuid().ToString();
+
+                // 2. Ghi đè mã phiên mới này vào RAM Server 
+                // (Ai đăng nhập sau sẽ chèn mã mới vào, làm mã cũ của người trước bị vô hiệu)
+                SessionControl.UserSessions[user.TenDangNhap] = newSessionId;
+                // ==========================================
+
                 // TẠO BỘ NHỚ COOKIE CHO USER
                 var claims = new List<Claim>
                 {
@@ -39,24 +51,22 @@ namespace SieuThiAnhDuong.Controllers
                     new Claim("ChucVu", chucVuThucTe),
                     new Claim("FullName", user.NhanVien?.HoTen ?? user.TenDangNhap),
                     new Claim("MaNV", user.MaNV.ToString()),
+                    new Claim("Quyen", user.Quyen ?? "Nhân viên"),
 
-                    // 👇 DÒNG QUYẾT ĐỊNH ĐÂY: BẮT BUỘC PHẢI THÊM VÀO 👇
-                    // Giả sử bảng TaiKhoan của bạn có cột Quyen lưu chữ "Admin"
-                    new Claim("Quyen", user.Quyen ?? "Nhân viên")
+                    // [THÊM MỚI] 3. Đưa mã phiên mới vào Cookie của máy tính này
+                    new Claim("UserSessionGuid", newSessionId)
                 };
 
-                // LƯU Ý NHỎ: Nếu Database của bạn không có cột "Quyen" mà bạn phân quyền Admin
-                // dựa vào cột "ChucVu" của nhân viên, thì thay dòng trên bằng dòng này:
-                // new Claim("Quyen", chucVuThucTe == "Quản trị viên" ? "Admin" : "Nhân viên")
-
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // Đăng xuất phiên hiện tại của chính máy này (nếu có bị kẹt) trước khi đăng nhập mới
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity),
                     new AuthenticationProperties { IsPersistent = true });
-
+                TempData["Success"] = "Đăng nhập thành công!";
                 return RedirectToAction("Index", "Home");
             }
 
@@ -69,7 +79,30 @@ namespace SieuThiAnhDuong.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
         }
+        [HttpGet]
+        [IgnoreAntiforgeryToken] // Tránh lỗi bảo mật khi gọi Ajax
+        public IActionResult CheckSession()
+        {
+            // 1. Nếu Cookie đã mất hiệu lực (đã bị SignOut bởi Middleware)
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
+            {
+                return Json(new { status = "stolen" });
+            }
 
+            var userName = User.Identity.Name;
+            var currentCookieSession = User.FindFirst("UserSessionGuid")?.Value;
+
+            // 2. So sánh mã trong Cookie với mã mới nhất trong RAM
+            if (SessionControl.UserSessions.ContainsKey(userName))
+            {
+                if (SessionControl.UserSessions[userName] != currentCookieSession)
+                {
+                    return Json(new { status = "stolen" });
+                }
+            }
+
+            return Json(new { status = "ok" });
+        }
         public async Task<IActionResult> Index()
         {
             var maNVClaim = User.FindFirst("MaNV")?.Value;
