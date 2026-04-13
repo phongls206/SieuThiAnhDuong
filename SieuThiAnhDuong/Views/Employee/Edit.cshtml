@@ -38,7 +38,10 @@
                             <label class="form-label fw-bold">Ngày sinh</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="bi bi-calendar-event"></i></span>
-                                <input asp-for="NgaySinh" type="date" class="form-control" />
+                                @* THÊM min và max VÀO ĐÂY *@
+                                <input asp-for="NgaySinh" type="date" class="form-control"
+                                       min="1900-01-01"
+                                       max="@DateTime.Now.ToString("yyyy-MM-dd")" />
                             </div>
                             <span asp-validation-for="NgaySinh" class="text-danger"></span>
                         </div>

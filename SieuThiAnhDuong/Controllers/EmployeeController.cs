@@ -21,7 +21,17 @@ namespace SieuThiAnhDuong.Controllers
             // Loại bỏ các thuộc tính liên kết để không bị lỗi ModelState khi thêm mới
             ModelState.Remove("TaiKhoan");
             ModelState.Remove("HoaDons");
-
+            if (nhanVien.NgaySinh.HasValue)
+            {
+                if (nhanVien.NgaySinh.Value.Year < 1900)
+                {
+                    ModelState.AddModelError("NgaySinh", "Năm sinh không được nhỏ hơn 1900!");
+                }
+                else if (nhanVien.NgaySinh.Value > DateTime.Now)
+                {
+                    ModelState.AddModelError("NgaySinh", "Ngày sinh không được vượt quá ngày hiện tại!");
+                }
+            }
             if (ModelState.IsValid)
             {
                 try
@@ -59,7 +69,17 @@ namespace SieuThiAnhDuong.Controllers
             // Loại bỏ kiểm tra các thuộc tính navigation liên quan để ModelState.IsValid trả về true
             ModelState.Remove("TaiKhoan");
             ModelState.Remove("HoaDons");
-
+            if (nhanVien.NgaySinh.HasValue)
+            {
+                if (nhanVien.NgaySinh.Value.Year < 1900)
+                {
+                    ModelState.AddModelError("NgaySinh", "Năm sinh không được nhỏ hơn 1900!");
+                }
+                else if (nhanVien.NgaySinh.Value > DateTime.Now)
+                {
+                    ModelState.AddModelError("NgaySinh", "Ngày sinh không được vượt quá ngày hiện tại!");
+                }
+            }
             if (ModelState.IsValid)
             {
                 try
