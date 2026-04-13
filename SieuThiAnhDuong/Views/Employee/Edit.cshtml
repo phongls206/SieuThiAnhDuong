@@ -22,7 +22,17 @@
                             </div>
                             <span asp-validation-for="HoTen" class="text-danger"></span>
                         </div>
-
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Giới tính </label>
+                            <select asp-for="GioiTinh" class="form-select shadow-sm" required>
+                                <option value="">-- Chọn giới tính --</option>
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                                <option value="Khác">Khác</option>
+                            </select>
+                            @* Dòng này sẽ hiện chữ đỏ "Vui lòng chọn giới tính" nếu để trống *@
+                            <span asp-validation-for="GioiTinh" class="text-danger small"></span>
+                        </div>
                         @* Cột mới: Ngày sinh *@
                         <div class="mb-3">
                             <label class="form-label fw-bold">Ngày sinh</label>

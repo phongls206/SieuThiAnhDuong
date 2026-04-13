@@ -26,9 +26,9 @@
                 <ul class="dropdown-menu shadow border-0">
                     <li><a class="dropdown-item filter-opt" href="#" data-status="all" data-text="Tất cả">Tất cả</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item filter-opt text-success" href="#" data-status="instock" data-text="Còn hàng">Còn hàng</a></li>
-                    <li><a class="dropdown-item filter-opt text-warning" href="#" data-status="lowstock" data-text="Sắp hết">Sắp hết</a></li>
-                    <li><a class="dropdown-item filter-opt text-danger" href="#" data-status="outstock" data-text="Hết hàng">Hết hàng</a></li>
+                    <li><a class="dropdown-item filter-opt text-success hover-con-hang" href="#" data-status="instock" data-text="Còn hàng">Còn hàng</a></li>
+                    <li><a class="dropdown-item filter-opt text-warning hover-sap-het" href="#" data-status="lowstock" data-text="Sắp hết">Sắp hết</a></li>
+                    <li><a class="dropdown-item filter-opt text-danger hover-het-hang" href="#" data-status="outstock" data-text="Hết hàng">Hết hàng</a></li>
                 </ul>
             </div>
         </div>
@@ -37,8 +37,7 @@
            <button type="button" id="btnReload" 
         class="btn bg-white border shadow-sm text-secondary h-100 d-flex align-items-center btn-reload-custom" 
         title="Tải lại bảng">
-    <i class="bi bi-arrow-clockwise me-1"></i>
-</button>
+    <i class="bi bi-arrow-clockwise me-1"></i></button>
         </div>
     </div>
 
@@ -145,14 +144,33 @@
     </script>
 
     <style>
-        /* 1. XÓA ICON MẶC ĐỊNH */
+        /* HIỆU ỨNG HOVER DROPDOWN THEO YÊU CẦU */
+        .dropdown-item {
+            transition: background-color 0.2s;
+        }
+
+        .hover-con-hang:hover {
+            background-color: #e8f5e9 !important; /* Xanh lá nhạt */
+            color: #1b5e20 !important;
+        }
+
+        .hover-sap-het:hover {
+            background-color: #fff8e1 !important; /* Vàng nhạt */
+            color: #827717 !important;
+        }
+
+        .hover-het-hang:hover {
+            background-color: #ffe8e8 !important; /* Đỏ nhạt */
+            color: #b71c1c !important;
+        }
+
+        /* GIỮ NGUYÊN CÁC STYLE CŨ */
         table.dataTable thead th::before,
         table.dataTable thead th::after {
             content: none !important;
             display: none !important;
         }
 
-        /* 2. STYLE ICON SORT CUSTOM */
         .can-sort {
             position: relative !important;
             cursor: pointer !important;
@@ -178,14 +196,13 @@
             font-weight: 600;
         }
 
-        /* 3. CUSTOM PHÂN TRANG GIỐNG ẢNH MẪU */
         .pagination { 
-            gap: 8px; /* Khoảng cách giữa các nút */
+            gap: 8px;
             margin-top: 10px;
         }
 
         .page-item .page-link {
-            border-radius: 12px !important; /* Bo tròn các nút */
+            border-radius: 12px !important;
             border: 1px solid #f0f0f0;
             color: #555;
             padding: 8px 16px;
@@ -194,7 +211,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        /* Nút đang được chọn (Active) - Màu xanh dương đậm */
         .page-item.active .page-link {
             background-color: #007bff !important;
             border-color: #007bff !important;
@@ -207,7 +223,6 @@
             color: #007bff;
         }
 
-        /* Ẩn bớt text info nếu cần để gọn */
         .dataTables_info {
             color: #6c757d;
             font-size: 0.9rem;

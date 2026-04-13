@@ -12,8 +12,8 @@ using SieuThiAnhDuong.Data;
 namespace SieuThiAnhDuong.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260413070422_checkloi")]
-    partial class checkloi
+    [Migration("20260413084040_MakeGenderRequired")]
+    partial class MakeGenderRequired
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -100,6 +100,10 @@ namespace SieuThiAnhDuong.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("GioiTinh")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HoTen")
                         .IsRequired()

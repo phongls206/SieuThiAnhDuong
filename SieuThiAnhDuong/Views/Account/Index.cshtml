@@ -15,6 +15,19 @@
                     <div class="col-sm-4 text-muted">Mã nhân viên:</div>
                     <div class="col-sm-8 fw-bold">#@Model.MaNV</div>
                 </div>
+
+                @* Thêm thông tin Giới tính *@
+                <div class="row mb-3 border-bottom pb-2">
+                    <div class="col-sm-4 text-muted">Giới tính:</div>
+                    <div class="col-sm-8">@(Model.GioiTinh ?? "Chưa xác định")</div>
+                </div>
+
+                @* Thêm thông tin Ngày sinh *@
+                <div class="row mb-3 border-bottom pb-2">
+                    <div class="col-sm-4 text-muted">Ngày sinh:</div>
+                    <div class="col-sm-8">@(Model.NgaySinh.HasValue? Model.NgaySinh.Value.ToString("dd/MM/yyyy") : "Chưa cập nhật")</div>
+                </div>
+
                 <div class="row mb-3 border-bottom pb-2">
                     <div class="col-sm-4 text-muted">Chức vụ:</div>
                     <div class="col-sm-8">
@@ -22,21 +35,18 @@
                             var chucVu = Model.ChucVu?.Trim();
                             if (chucVu != null && chucVu.Equals("Admin", StringComparison.OrdinalIgnoreCase))
                             {
-                                @* Màu Đỏ cho Admin - In hoa, đổ bóng *@
                                 <span class="badge shadow-sm px-3 py-2 text-uppercase" style="background-color: #dc3545; color: white; min-width: 100px;">
-                               @chucVu
+                                    @chucVu
                                 </span>
                             }
                             else if (chucVu != null && chucVu.Equals("Thủ kho", StringComparison.OrdinalIgnoreCase))
                             {
-                                @* Màu Xanh Ngọc cho Thủ kho - Chữ đen *@
                                 <span class="badge shadow-sm px-3 py-2 text-uppercase text-dark" style="background-color: #0dcaf0; min-width: 100px;">
                                     @chucVu
                                 </span>
                             }
                             else
                             {
-                                @* Màu Xanh Dương cho Nhân viên *@
                                 <span class="badge shadow-sm px-3 py-2 text-uppercase" style="background-color: #0d6efd; color: white; min-width: 100px;">
                                     @chucVu
                                 </span>
@@ -70,7 +80,7 @@
     </div>
 </div>
 
-@* Modal Đổi mật khẩu *@
+@* Modal Đổi mật khẩu giữ nguyên như cũ *@
 <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
@@ -105,7 +115,6 @@
     <script>
         $('#changePasswordForm').on('submit', function (e) {
             e.preventDefault();
-            
             const formData = $(this).serialize();
 
             $.ajax({

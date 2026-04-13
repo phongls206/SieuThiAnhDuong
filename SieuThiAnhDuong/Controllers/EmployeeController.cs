@@ -52,7 +52,7 @@ namespace SieuThiAnhDuong.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         // FIX: Đã thêm NgaySinh vào danh sách Bind để nhận dữ liệu từ Form gửi về
-        public async Task<IActionResult> Edit(int id, [Bind("MaNV,HoTen,NgaySinh,ChucVu,SoDT,DiaChi")] NhanVien nhanVien)
+        public async Task<IActionResult> Edit(int id, [Bind("MaNV,HoTen,GioiTinh,NgaySinh,ChucVu,SoDT,DiaChi")] NhanVien nhanVien)
         {
             if (id != nhanVien.MaNV) return NotFound();
 

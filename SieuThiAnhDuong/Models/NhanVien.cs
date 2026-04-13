@@ -11,7 +11,8 @@ namespace SieuThiAnhDuong.Models
         [StringLength(100, ErrorMessage = "Họ tên không được vượt quá 100 ký tự")]
         public string HoTen { get; set; }
 
-
+        [Required(ErrorMessage = "Vui lòng chọn giới tính")]
+        public string GioiTinh { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn ngày sinh")]
         [Display(Name = "Ngày sinh")]
