@@ -1,73 +1,73 @@
 ﻿@model SieuThiAnhDuong.Models.NhanVien
 
-<div class="container mt-4">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0"><i class="bi bi-person-plus-fill me-2"></i>Thêm Nhân Viên Mới</h4>
-        </div>
-        <div class="card-body">
-            <form asp-action="Create" method="post">
-                @* SỬA DÒNG NÀY: Thay "All" bằng "ModelOnly" để ẩn lỗi hệ thống tiếng Anh *@
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 fw-bold"></div>
+<div class="container mt-3 pb-4">
+    <div class="row justify-content-center">
+        @* Khống chế độ rộng: col-lg-5 cho PC, col-12 cho Mobile *@
+        <div class="col-12 col-md-8 col-lg-5 col-xl-4">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white py-2">
+                    <h5 class="mb-0 text-nowrap text-center">
+                        <i class="bi bi-person-plus-fill me-2"></i>THÊM NHÂN VIÊN MỚI
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-2 fw-bold small"></div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Họ và tên</label>
-                    <input asp-for="HoTen" class="form-control" placeholder="Nhập đầy đủ họ tên..." />
-                    <span asp-validation-for="HoTen" class="text-danger"></span>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Giới tính</label>
-                    <select asp-for="GioiTinh" class="form-select shadow-sm" required>
-                        <option value="">-- Chọn giới tính --</option>
-                        <option value="Nam">Nam</option>
-                        <option value="Nữ">Nữ</option>
-                        <option value="Khác">Khác</option>
-                    </select>
-                    @* Dòng này sẽ hiện chữ đỏ "Vui lòng chọn giới tính" nếu để trống *@
-                    <span asp-validation-for="GioiTinh" class="text-danger small"></span>
-                </div>
+                        <div class="mb-2">
+                            <label class="form-label fw-bold small mb-1">Họ và tên</label>
+                            <input asp-for="HoTen" class="form-control form-control-sm" placeholder="Nhập đầy đủ họ tên..." />
+                            <span asp-validation-for="HoTen" class="text-danger small"></span>
+                        </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Ngày sinh</label>
-                    <input asp-for="NgaySinh" type="date" class="form-control" min="1900-01-01"
-                           max="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                    <span asp-validation-for="NgaySinh" class="text-danger"></span>
-                </div>
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <label class="form-label fw-bold small mb-1">Giới tính</label>
+                                <select asp-for="GioiTinh" class="form-select form-select-sm" required>
+                                    <option value="">-- Chọn --</option>
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold small mb-1">Chức vụ</label>
+                                <select asp-for="ChucVu" class="form-select form-select-sm border-primary">
+                                    <option value="">-- Chọn --</option>
+                                    <option value="Admin">Admin</option>
+                                    <option value="Thủ kho">Thủ kho</option>
+                                    <option value="Nhân viên">Nhân viên</option>
+                                </select>
+                            </div>
+                        </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Địa chỉ</label>
-                    <input asp-for="DiaChi" class="form-control" placeholder="Số nhà, tên đường, quận/huyện..." />
-                    <span asp-validation-for="DiaChi" class="text-danger"></span>
-                </div>
+                        <div class="mb-2">
+                            <label class="form-label fw-bold small mb-1">Ngày sinh</label>
+                            <input asp-for="NgaySinh" type="date" class="form-control form-control-sm"
+                                   max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Số điện thoại</label>
-                        <input asp-for="SoDT" class="form-control"
-                               maxlength="10"
-                               placeholder="Phải đủ 10 số..."
-                               oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
-                        <span asp-validation-for="SoDT" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Chức vụ</label>
-                        <select asp-for="ChucVu" class="form-select border-primary">
-                            <option value="">-- Chọn chức vụ --</option>
-                            <option value="Admin">Admin</option>
-                            <option value="Thủ kho">Thủ kho</option>
-                            <option value="Nhân viên">Nhân viên</option>
-                        </select>
-                        <span asp-validation-for="ChucVu" class="text-danger"></span>
-                    </div>
-                </div>
+                        <div class="mb-2">
+                            <label class="form-label fw-bold small mb-1">Số điện thoại</label>
+                            <input asp-for="SoDT" class="form-control form-control-sm" maxlength="10"
+                                   placeholder="Đủ 10 số..." oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
+                        </div>
 
-                <div class="mt-4 border-top pt-3">
-                    <button type="submit" class="btn btn-primary px-4 fw-bold">
-                        <i class="bi bi-save me-2"></i>Lưu nhân viên
-                    </button>
-                    <a asp-action="Index" class="btn btn-secondary px-4">Hủy</a>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small mb-1">Địa chỉ</label>
+                            <input asp-for="DiaChi" class="form-control form-control-sm" placeholder="Số nhà, tên đường..." />
+                        </div>
+
+                        <div class="d-grid gap-2 pt-2 border-top">
+                            <button type="submit" class="btn btn-primary btn-sm fw-bold">
+                                <i class="bi bi-save me-2"></i>LƯU NHÂN VIÊN
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">HỦY BỎ</a>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>

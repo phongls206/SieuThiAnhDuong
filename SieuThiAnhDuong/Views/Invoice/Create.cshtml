@@ -16,7 +16,6 @@
         max-height: 530px; 
         overflow-y: auto;
         overflow-x: hidden;
-        /* Tối ưu chống lag (Hardware Acceleration) */
         -webkit-overflow-scrolling: touch;
         will-change: scroll-position;
     }
@@ -30,45 +29,55 @@
         box-shadow: inset 0 -1px 0 #dee2e6;
     }
 
-    /* 3. Thanh cuộn màu xám trung tính, bớt nổi */
-    .product-table-wrapper::-webkit-scrollbar { 
-        width: 6px; 
-    }
-    .product-table-wrapper::-webkit-scrollbar-track {
-        background: transparent; /* Để track trong suốt cho đỡ rối */
-    }
-    .product-table-wrapper::-webkit-scrollbar-thumb { 
-        background: #ccc; 
-        border-radius: 10px; 
-    }
-    .product-table-wrapper::-webkit-scrollbar-thumb:hover { 
-        background: #bbb; 
-    }
+    /* 3. Thanh cuộn */
+    .product-table-wrapper::-webkit-scrollbar { width: 6px; }
+    .product-table-wrapper::-webkit-scrollbar-track { background: transparent; }
+    .product-table-wrapper::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
 
-    /* Tối ưu render hàng để vuốt mượt hơn */
-    #productList tr {
-        transform: translateZ(0);
+    #productList tr { transform: translateZ(0); }
+
+    /* --- Responsive cho Mobile --- */
+    @@media (max-width: 767.98px) {
+        .product-table-wrapper { max-height: 400px; } /* Giảm chiều cao bảng trên mobile để nhường chỗ cho giỏ hàng */
+        .card-header h4 { font-size: 1.1rem; }
+        #searchProduct { font-size: 0.9rem; }
+        .table thead { display: none; } /* Ẩn tiêu đề bảng trên mobile để tiết kiệm diện tích */
+        .table td { display: block; text-align: left !important; border: none; padding: 0.5rem 1rem; }
+        .table tr { display: block; border-bottom: 1px solid #eee; padding: 10px 0; }
+        
+        /* Hiển thị số lượng và nút bấm trên cùng 1 hàng ở mobile */
+        .mobile-action-row {
+            display: flex;
+            align-items: center;
+            justify-content:间-between;
+            gap: 10px;
+            padding: 0 1rem;
+        }
     }
 </style>
 
 <div class="container-fluid mt-4">
     <div class="row g-4">
         @* --- CỘT BÊN TRÁI: DANH MỤC SẢN PHẨM --- *@
-        <div class="col-md-8">
+        <div class="col-12 col-md-8"> @* Chiếm 12 cột trên mobile, 8 cột trên PC *@
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-white py-3 border-bottom">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0 text-primary fw-bold"><i class="bi bi-card-checklist me-2"></i>Danh mục mặt hàng</h4>
-                        <div class="input-group shadow-sm" style="max-width: 350px;">
-                            <span class="input-group-text bg-white border-primary text-primary"><i class="bi bi-search"></i></span>
-                            <input type="text" id="searchProduct" class="form-control border-primary" placeholder="Tìm tên sản phẩm nhanh...">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-12 col-sm-6">
+                            <h4 class="mb-0 text-primary fw-bold"><i class="bi bi-card-checklist me-2"></i>Danh mục</h4>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="input-group shadow-sm">
+                                <span class="input-group-text bg-white border-primary text-primary"><i class="bi bi-search"></i></span>
+                                <input type="text" id="searchProduct" class="form-control border-primary" placeholder="Tìm tên sản phẩm...">
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive product-table-wrapper">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
+                            <thead class="table-light d-none d-md-table-header-group">
                                 <tr>
                                     <th class="ps-3">Sản phẩm</th>
                                     <th>Giá bán</th>
@@ -81,40 +90,45 @@
                                 @foreach (var p in ViewBag.Products)
                                 {
                                     <tr>
-                                        <td class="ps-3 fw-bold text-dark">@p.TenSP</td>
-                                        <td class="text-danger fw-bold">@p.GiaBan.ToString("N0") đ</td>
-                                        <td class="text-center">
-                                            @if (p.SoLuongTon <= 0)
-                                            {
-                                                <span class="badge bg-danger shadow-sm py-2 px-3 w-75">Hết hàng</span>
-                                            }
-                                            else if (p.SoLuongTon < 10)
-                                            {
-                                                <span class="badge bg-warning text-dark shadow-sm py-2 px-3 w-75">Sắp hết (@p.SoLuongTon)</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-success shadow-sm py-2 px-3 w-75">Còn (@p.SoLuongTon)</span>
-                                            }
+                                        <td class="ps-3 fw-bold text-dark">
+                                            <span class="d-md-none text-muted fw-normal small">Sản phẩm: </span>@p.TenSP
                                         </td>
-                                        <td>
-                                            <div class="input-group input-group-sm px-2">
-                                                <input type="number" id="qty-@p.MaSP"
-                                                       value="@(p.SoLuongTon > 0 ? 1 : 0)"
-                                                       min="0"
-                                                       max="@p.SoLuongTon"
-                                                       oninput="checkQty(@p.MaSP, @p.SoLuongTon)"
-                                                       class="form-control text-center fw-bold border-primary"
-                                                 @(p.SoLuongTon <= 0 ? "disabled" : "") />
+                                        <td class="text-danger fw-bold">
+                                            <span class="d-md-none text-muted fw-normal small">Giá: </span>@p.GiaBan.ToString("N0") đ
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex align-items-center justify-content-md-center">
+                                                <span class="d-md-none text-muted fw-normal small me-2">Tồn: </span>
+                                                @if (p.SoLuongTon <= 0) {
+                                                    <span class="badge bg-danger shadow-sm py-2 px-3">Hết hàng</span>
+                                                }
+                                                else if (p.SoLuongTon < 10) {
+                                                    <span class="badge bg-warning text-dark shadow-sm py-2 px-3">Sắp hết (@p.SoLuongTon)</span>
+                                                }
+                                                else {
+                                                    <span class="badge bg-success shadow-sm py-2 px-3">Còn (@p.SoLuongTon)</span>
+                                                }
                                             </div>
                                         </td>
-                                        <td class="text-end pe-3">
-                                            <button id="btn-add-@p.MaSP"
-                                                    onclick="addToCart(@p.MaSP, '@p.TenSP', @p.GiaBan, @p.SoLuongTon)"
-                                                    class="btn @(p.SoLuongTon > 0 ? "btn-primary" : "btn-secondary") btn-sm px-3 shadow-sm"
-                                                @(p.SoLuongTon <= 0 ? "disabled" : "")>
-                                                <i class="bi bi-plus-lg"></i> Thêm
-                                            </button>
+                                        @* Group input và button lại để responsive đẹp hơn trên điện thoại *@
+                                        <td colspan="2">
+                                            <div class="d-flex align-items-center justify-content-between gap-2 px-2 px-md-0">
+                                                <div style="width: 100px;">
+                                                    <input type="number" id="qty-@p.MaSP"
+                                                           value="@(p.SoLuongTon > 0 ? 1 : 0)"
+                                                           min="0"
+                                                           max="@p.SoLuongTon"
+                                                           oninput="checkQty(@p.MaSP, @p.SoLuongTon)"
+                                                           class="form-control form-control-sm text-center fw-bold border-primary"
+                                                           @(p.SoLuongTon <= 0 ? "disabled" : "") />
+                                                </div>
+                                                <button id="btn-add-@p.MaSP"
+                                                        onclick="addToCart(@p.MaSP, '@p.TenSP', @p.GiaBan, @p.SoLuongTon)"
+                                                        class="btn @(p.SoLuongTon > 0 ? "btn-primary" : "btn-secondary") btn-sm px-3 shadow-sm flex-grow-1 flex-md-grow-0"
+                                                        @(p.SoLuongTon <= 0 ? "disabled" : "")>
+                                                    <i class="bi bi-plus-lg"></i> Thêm
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 }
@@ -126,7 +140,7 @@
         </div>
 
         @* --- CỘT BÊN PHẢI: GIỎ HÀNG --- *@
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <div class="card shadow border-0 overflow-hidden">
                 <div class="card-header bg-success text-white py-3">
                     <h4 class="mb-0 fw-bold"><i class="bi bi-cart3 me-2"></i>Giỏ hàng</h4>
@@ -141,7 +155,7 @@
                     <hr class="border-secondary opacity-25">
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-dark"><i class="bi bi-credit-card-2-back me-1"></i> Phương thức thanh toán:</label>
+                        <label class="form-label fw-bold text-dark"><i class="bi bi-credit-card-2-back me-1"></i> Thanh toán:</label>
                         <select id="phuongThucThanhToan" class="form-select border-success shadow-sm">
                             <option value="Tiền mặt">💵 Tiền mặt</option>
                             <option value="Chuyển khoản">💳 Chuyển khoản</option>
@@ -150,11 +164,11 @@
 
                     <div class="d-flex justify-content-between align-items-center mb-4 bg-light p-3 rounded-3 shadow-sm border">
                         <span class="h5 mb-0 fw-bold">Tổng cộng:</span>
-                        <span class="h3 mb-0 text-danger fw-bold"><span id="totalAmount">0</span> đ</span>
+                        <span class="h4 mb-0 text-danger fw-bold"><span id="totalAmount">0</span> đ</span>
                     </div>
 
                     <button onclick="finishOrder()" class="btn btn-success w-100 py-3 fw-bold shadow-sm rounded-pill text-uppercase">
-                        <i class="bi bi-printer me-2"></i> Thanh toán & In hóa đơn
+                        <i class="bi bi-printer me-2"></i> Thanh toán
                     </button>
                 </div>
             </div>
@@ -163,9 +177,9 @@
 </div>
 
 <script>
+    // GIỮ NGUYÊN TOÀN BỘ JS CỦA BẠN
     let cart = [];
 
-    // Tìm kiếm nhanh
     document.getElementById('searchProduct').addEventListener('input', function () {
         let filter = this.value.toLowerCase().trim();
         let rows = document.querySelectorAll('#productList tr');

@@ -1,91 +1,85 @@
 ﻿@model SieuThiAnhDuong.Models.NhanVien
 
-<div class="container-fluid">
+<div class="container mt-3 pb-4">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 mt-4">
-                <div class="card-header bg-white py-3">
-                    <h4 class="fw-bold text-primary mb-0"><i class="bi bi-pencil-square me-2"></i>CẬP NHẬT NHÂN VIÊN</h4>
+        @* Giới hạn độ rộng hợp lý cho PC và Mobile *@
+        <div class="col-12 col-md-7 col-lg-5 col-xl-4">
+            <div class="card shadow-sm border-0">
+                @* Thu nhỏ header để nhường chỗ cho nội dung *@
+                <div class="card-header bg-white py-2 border-bottom">
+                    <h5 class="fw-bold text-primary mb-0 text-center">
+                        <i class="bi bi-pencil-square me-1"></i> CẬP NHẬT NHÂN VIÊN
+                    </h5>
                 </div>
-                <div class="card-body p-4">
+                
+                <div class="card-body p-3">
                     <form asp-action="Edit" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="MaNV" />
 
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Họ và tên</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
-                                <input asp-for="HoTen" class="form-control" placeholder="Nhập họ tên nhân viên" />
+                        @* Họ và tên - Giảm mb-3 xuống mb-2 *@
+                        <div class="mb-2">
+                            <label class="form-label fw-bold small mb-1">Họ và tên</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light text-primary"><i class="bi bi-person"></i></span>
+                                <input asp-for="HoTen" class="form-control" placeholder="Họ tên..." />
                             </div>
-                            <span asp-validation-for="HoTen" class="text-danger"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Giới tính </label>
-                            <select asp-for="GioiTinh" class="form-select shadow-sm" required>
-                                <option value="">-- Chọn giới tính --</option>
-                                <option value="Nam">Nam</option>
-                                <option value="Nữ">Nữ</option>
-                                <option value="Khác">Khác</option>
-                            </select>
-                            @* Dòng này sẽ hiện chữ đỏ "Vui lòng chọn giới tính" nếu để trống *@
-                            <span asp-validation-for="GioiTinh" class="text-danger small"></span>
-                        </div>
-                        @* Cột mới: Ngày sinh *@
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Ngày sinh</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-calendar-event"></i></span>
-                                @* THÊM min và max VÀO ĐÂY *@
-                                <input asp-for="NgaySinh" type="date" class="form-control"
-                                       min="1900-01-01"
-                                       max="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                            </div>
-                            <span asp-validation-for="NgaySinh" class="text-danger"></span>
+                            <span asp-validation-for="HoTen" class="text-danger small"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Chức vụ</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-briefcase"></i></span>
-                                <select asp-for="ChucVu" class="form-select border-primary">
+                        @* Giới tính & Chức vụ - Cho nằm cùng 1 hàng để tiết kiệm diện tích *@
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <label class="form-label fw-bold small mb-1">Giới tính</label>
+                                <select asp-for="GioiTinh" class="form-select form-select-sm" required>
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold small mb-1">Chức vụ</label>
+                                <select asp-for="ChucVu" class="form-select form-select-sm border-primary">
                                     <option value="Admin">Admin</option>
                                     <option value="Thủ kho">Thủ kho</option>
                                     <option value="Nhân viên">Nhân viên</option>
                                 </select>
                             </div>
-                            <span asp-validation-for="ChucVu" class="text-danger"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Số điện thoại</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-telephone"></i></span>
-                                <input asp-for="SoDT" class="form-control"
-                                       maxlength="10"
-                                       oninput="this.value = this.value.replace(/[^0-9]/g, '');"
-                                       placeholder="Nhập đủ 10 chữ số..." />
+                        @* Ngày sinh *@
+                        <div class="mb-2">
+                            <label class="form-label fw-bold small mb-1">Ngày sinh</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light text-primary"><i class="bi bi-calendar-event"></i></span>
+                                <input asp-for="NgaySinh" type="date" class="form-control" />
                             </div>
-                            <span asp-validation-for="SoDT" class="text-danger"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Địa chỉ</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-geo-alt"></i></span>
-                                <textarea asp-for="DiaChi" class="form-control" rows="2" placeholder="Địa chỉ thường trú..."></textarea>
+                        @* Số điện thoại *@
+                        <div class="mb-2">
+                            <label class="form-label fw-bold small mb-1">Số điện thoại</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light text-primary"><i class="bi bi-telephone"></i></span>
+                                <input asp-for="SoDT" class="form-control" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
                             </div>
-                            <span asp-validation-for="DiaChi" class="text-danger"></span>
                         </div>
 
-                        <hr />
-                        <div class="d-flex justify-content-end gap-2">
-                            <a asp-action="Index" class="btn btn-light border">Hủy bỏ</a>
-                            <button type="submit" class="btn btn-primary px-4 fw-bold">
+                        @* Địa chỉ *@
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small mb-1">Địa chỉ</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light text-primary"><i class="bi bi-geo-alt"></i></span>
+                                <textarea asp-for="DiaChi" class="form-control" rows="2" style="font-size: 0.85rem;"></textarea>
+                            </div>
+                        </div>
+
+                        @* Nút bấm - Căn giữa và gọn gàng *@
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-sm fw-bold">
                                 <i class="bi bi-save me-1"></i> Lưu thay đổi
                             </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Quay lại</a>
                         </div>
                     </form>
                 </div>
@@ -93,6 +87,23 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Ép kích thước chữ nhỏ lại một chút để không bị tràn màn hình laptop/mobile */
+    .form-control-sm, .form-select-sm, .input-group-text {
+        padding: 0.4rem 0.6rem;
+    }
+    
+    label {
+        color: #555;
+    }
+
+    /* Đảm bảo card không quá dài */
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+</style>
 
 @section Scripts {
     @{

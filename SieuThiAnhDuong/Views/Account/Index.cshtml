@@ -1,86 +1,89 @@
 ﻿@model SieuThiAnhDuong.Models.NhanVien
 
 <div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card shadow-sm border-0 p-4">
+    @* Sắp xếp lại thứ tự: Mobile hiện ảnh trước (order-1), sau đó đến thông tin (order-2) *@
+    <div class="row g-4">
+        <div class="col-12 col-md-4 order-1 order-md-2 text-center">
+            <div class="card shadow-sm border-0 p-4 p-md-5 h-100">
+                <img src="https://ui-avatars.com/api/?name=@Model.HoTen&background=random"
+                     class="rounded-circle img-thumbnail mx-auto mb-3 shadow-sm" style="width: 120px;">
+                <h5 class="fw-bold">@Model.HoTen</h5>
+                
+                @* Nút đổi mật khẩu - Căn chỉnh lại độ rộng trên mobile *@
+                <button type="button" class="btn btn-outline-primary btn-sm mt-3 px-4" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                    <i class="bi bi-key-fill me-1"></i> Đổi mật khẩu
+                </button>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-8 order-2 order-md-1">
+            <div class="card shadow-sm border-0 p-3 p-md-4">
                 <h5 class="text-primary fw-bold mb-4">
                     <i class="bi bi-person-vcard"></i> Thông tin tài khoản
                 </h5>
-                <div class="row mb-3 border-bottom pb-2">
-                    <div class="col-sm-4 text-muted">Họ và tên:</div>
-                    <div class="col-sm-8 fw-bold">@Model.HoTen</div>
-                </div>
-                <div class="row mb-3 border-bottom pb-2">
-                    <div class="col-sm-4 text-muted">Mã nhân viên:</div>
-                    <div class="col-sm-8 fw-bold">#@Model.MaNV</div>
+                
+                <div class="row mb-3 border-bottom pb-2 g-0">
+                    <div class="col-5 col-sm-4 text-muted">Họ và tên:</div>
+                    <div class="col-7 col-sm-8 fw-bold">@Model.HoTen</div>
                 </div>
 
-                @* Thêm thông tin Giới tính *@
-                <div class="row mb-3 border-bottom pb-2">
-                    <div class="col-sm-4 text-muted">Giới tính:</div>
-                    <div class="col-sm-8">@(Model.GioiTinh ?? "Chưa xác định")</div>
+                <div class="row mb-3 border-bottom pb-2 g-0">
+                    <div class="col-5 col-sm-4 text-muted">Mã nhân viên:</div>
+                    <div class="col-7 col-sm-8 fw-bold">#@Model.MaNV</div>
                 </div>
 
-                @* Thêm thông tin Ngày sinh *@
-                <div class="row mb-3 border-bottom pb-2">
-                    <div class="col-sm-4 text-muted">Ngày sinh:</div>
-                    <div class="col-sm-8">@(Model.NgaySinh.HasValue? Model.NgaySinh.Value.ToString("dd/MM/yyyy") : "Chưa cập nhật")</div>
+                <div class="row mb-3 border-bottom pb-2 g-0">
+                    <div class="col-5 col-sm-4 text-muted">Giới tính:</div>
+                    <div class="col-7 col-sm-8">@(Model.GioiTinh ?? "Chưa xác định")</div>
                 </div>
 
-                <div class="row mb-3 border-bottom pb-2">
-                    <div class="col-sm-4 text-muted">Chức vụ:</div>
-                    <div class="col-sm-8">
+                <div class="row mb-3 border-bottom pb-2 g-0">
+                    <div class="col-5 col-sm-4 text-muted">Ngày sinh:</div>
+                    <div class="col-7 col-sm-8">@(Model.NgaySinh.HasValue? Model.NgaySinh.Value.ToString("dd/MM/yyyy") : "Chưa cập nhật")</div>
+                </div>
+
+                <div class="row mb-3 border-bottom pb-2 g-0 align-items-center">
+                    <div class="col-5 col-sm-4 text-muted">Chức vụ:</div>
+                    <div class="col-7 col-sm-8">
                         @{
                             var chucVu = Model.ChucVu?.Trim();
                             if (chucVu != null && chucVu.Equals("Admin", StringComparison.OrdinalIgnoreCase))
                             {
-                                <span class="badge shadow-sm px-3 py-2 text-uppercase" style="background-color: #dc3545; color: white; min-width: 100px;">
+                                <span class="badge shadow-sm px-3 py-2 text-uppercase badge-custom" style="background-color: #dc3545; color: white;">
                                     @chucVu
                                 </span>
                             }
                             else if (chucVu != null && chucVu.Equals("Thủ kho", StringComparison.OrdinalIgnoreCase))
                             {
-                                <span class="badge shadow-sm px-3 py-2 text-uppercase text-dark" style="background-color: #0dcaf0; min-width: 100px;">
+                                <span class="badge shadow-sm px-3 py-2 text-uppercase text-dark badge-custom" style="background-color: #0dcaf0;">
                                     @chucVu
                                 </span>
                             }
                             else
                             {
-                                <span class="badge shadow-sm px-3 py-2 text-uppercase" style="background-color: #0d6efd; color: white; min-width: 100px;">
+                                <span class="badge shadow-sm px-3 py-2 text-uppercase badge-custom" style="background-color: #0d6efd; color: white;">
                                     @chucVu
                                 </span>
                             }
                         }
                     </div>
                 </div>
-                <div class="row mb-3 border-bottom pb-2">
-                    <div class="col-sm-4 text-muted">Số điện thoại:</div>
-                    <div class="col-sm-8">@Model.SoDT</div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-sm-4 text-muted">Địa chỉ:</div>
-                    <div class="col-sm-8">@Model.DiaChi</div>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-4 text-center">
-            <div class="card shadow-sm border-0 p-5 h-100">
-                <img src="https://ui-avatars.com/api/?name=@Model.HoTen&background=random"
-                     class="rounded-circle img-thumbnail mx-auto mb-3 mt-3 shadow-sm" style="width: 120px;">
-                <h5 class="fw-bold">@Model.HoTen</h5>
-                
-                @* Nút đổi mật khẩu *@
-                <button type="button" class="btn btn-outline-primary btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
-                    <i class="bi bi-key-fill me-1"></i> Đổi mật khẩu
-                </button>
+                <div class="row mb-3 border-bottom pb-2 g-0">
+                    <div class="col-5 col-sm-4 text-muted">Số điện thoại:</div>
+                    <div class="col-7 col-sm-8">@Model.SoDT</div>
+                </div>
+
+                <div class="row mb-3 g-0">
+                    <div class="col-5 col-sm-4 text-muted">Địa chỉ:</div>
+                    <div class="col-7 col-sm-8">@Model.DiaChi</div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-@* Modal Đổi mật khẩu giữ nguyên như cũ *@
+@* Modal Đổi mật khẩu - Giữ nguyên *@
 <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
@@ -110,6 +113,20 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* CSS hỗ trợ responsive cho badge và text */
+    .badge-custom {
+        min-width: 100px;
+        font-size: 0.75rem;
+    }
+
+    @@media (max-width: 576px) {
+        .container { padding-bottom: 30px; }
+        .card { font-size: 0.9rem; }
+        .badge-custom { min-width: 80px; font-size: 0.7rem; }
+    }
+</style>
 
 @section Scripts {
     <script>

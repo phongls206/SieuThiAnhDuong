@@ -18,7 +18,6 @@
             --glass-bg: rgba(255, 255, 255, 0.95);
         }
 
-        /* FIX: Khóa cứng layout để không bị dịch khi hiện Popup */
         html, body {
             margin: 0;
             padding: 0 !important;
@@ -35,10 +34,13 @@
             position: relative;
         }
 
-        /* Ép body không nhảy padding khi Swal hiện */
-        body.swal2-shown {
-            padding-right: 0 !important;
+        /* Responsive cho Body trên Mobile */
+        @@media (max-width: 768px) {
+            html, body { overflow-y: auto !important; height: auto; min-height: 100vh; }
+            body { padding: 20px 10px !important; }
         }
+
+        body.swal2-shown { padding-right: 0 !important; }
 
         body::before, body::after {
             content: "";
@@ -56,7 +58,7 @@
             background: white;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* Đổ bóng nhẹ mặc định */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             width: 100%;
             max-width: 950px;
             display: flex;
@@ -68,7 +70,11 @@
             transform: translateZ(0);
         }
 
-        /* FIX: Thêm lại Hover bóng nhẹ mượt mà */
+        /* RESPONSIVE CONTAINER */
+        @@media (max-width: 768px) {
+            .login-container { flex-direction: column; max-width: 100%; min-height: auto; margin: 10px; }
+        }
+
         .login-container:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.12);
@@ -84,6 +90,14 @@
             flex-direction: column; 
             justify-content: center; 
             position: relative;
+        }
+
+        /* RESPONSIVE SIDEBAR */
+        @@media (max-width: 768px) {
+            .login-sidebar { width: 100%; padding: 30px 20px; text-align: center; }
+            .login-sidebar .feature-list { display: none; } /* Ẩn tính năng trên mobile để tinh gọn */
+            .intro-box { height: 100px; margin-bottom: 10px; align-items: center; }
+            #cartIcon { left: 50%; margin-left: -32px; } /* Center cart animation */
         }
 
         .intro-box {
@@ -122,6 +136,10 @@
 
         .static-cart { font-size: 2.5rem; margin-bottom: 10px; display: block; color: #fff; }
         .login-sidebar h2 { font-weight: 800; font-size: 2.2rem; margin: 0; line-height: 1.2; }
+        
+        @@media (max-width: 576px) {
+            .login-sidebar h2 { font-size: 1.8rem; }
+        }
 
         .login-sidebar .feature-item { 
             display: flex; 
@@ -143,6 +161,11 @@
             flex-direction: column; 
             justify-content: center; 
             background-color: #fff;
+        }
+
+        /* RESPONSIVE FORM SECTION */
+        @@media (max-width: 768px) {
+            .login-form-section { width: 100%; padding: 30px 20px; }
         }
 
         .login-form-section h3 { font-weight: 800; color: #1a1a1a; margin-bottom: 8px; font-size: 1.8rem; }
@@ -185,18 +208,6 @@
             transition: 0.3s;
             outline: none;
         }
-        .password-toggle:hover { color: var(--primary-blue); }
-
-        .forgot-password {
-            color: var(--primary-blue);
-            text-decoration: none;
-            font-weight: 500;
-            transition: 0.3s;
-            display: inline-block;
-            padding: 5px 10px;
-            outline: none !important;
-        }
-        .forgot-password:hover { color: var(--dark-blue); text-decoration: underline !important; }
 
         .btn-login { 
             background: linear-gradient(to right, #007bff, #0056b3); 
@@ -233,7 +244,7 @@
                     <h2>Siêu Thị<br>Ánh Dương</h2>
                 </div>
             </div>
-            <p class="mb-4" style="opacity: 0.9; font-weight: 300;">Phần mềm quản lý bán hàng thông minh, tối ưu hóa quy trình vận hành siêu thị.</p>
+            <p class="mb-4" style="opacity: 0.9; font-weight: 300;">Phần mềm quản lý bán hàng thông minh.</p>
             <div class="feature-list">
                 <div class="feature-item"><i class="bi bi-shield-check"></i> Quản lý mặt hàng hiệu quả</div>
                 <div class="feature-item"><i class="bi bi-lightning-charge"></i> Xử lý giao dịch nhanh chóng</div>
@@ -257,7 +268,7 @@
             }
 
             <h3>Chào mừng trở lại!</h3>
-            <p>Vui lòng đăng nhập để bắt đầu phiên làm việc.</p>
+            <p>Vui lòng đăng nhập để bắt đầu.</p>
 
             <form asp-action="Login" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
@@ -266,7 +277,7 @@
                     <label class="form-label small fw-bold">Tên đăng nhập</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-person-circle"></i></span>
-                        <input asp-for="Username" class="form-control" placeholder="Nhập tài khoản của bạn" required />
+                        <input asp-for="Username" class="form-control" placeholder="Tài khoản" required />
                     </div>
                 </div>
 
@@ -274,7 +285,7 @@
                     <label class="form-label small fw-bold">Mật khẩu</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-                        <input asp-for="Password" type="password" id="passwordInput" class="form-control" placeholder="Nhập mật khẩu" required />
+                        <input asp-for="Password" type="password" id="passwordInput" class="form-control" placeholder="Mật khẩu" required />
                         <button type="button" class="password-toggle" id="togglePassword">
                             <i class="bi bi-eye-slash" id="eyeIcon"></i>
                         </button>
@@ -286,15 +297,15 @@
                 </button>
 
                 <div class="text-center" style="height: 30px;">
-                    <a href="javascript:void(0)" class="forgot-password small text-muted" id="btnForgot">
+                    <a href="javascript:void(0)" class="forgot-password small text-muted" id="btnForgot" style="text-decoration:none">
                         Quên mật khẩu?
                     </a>
                 </div>
             </form>
 
             <div class="footer-text">
-                Hỗ trợ kỹ thuật: <strong>0787.304.341</strong> (24/7)<br />
-                <span style="font-size: 0.75rem; margin-top: 5px; display: block;">© 2026 Ánh Dương Mart - All Rights Reserved</span>
+                Hỗ trợ kỹ thuật: <strong>0787.304.341</strong><br />
+                <span style="font-size: 0.75rem; margin-top: 5px; display: block;">© 2026 Ánh Dương Mart</span>
             </div>
         </div>
     </div>
@@ -321,7 +332,6 @@
                 eyeIcon.toggleClass('bi-eye bi-eye-slash');
             });
 
-            // FIX: Thêm heightAuto và scrollbarPadding để giữ form đứng im
             $('#btnForgot').on('click', function() {
                 Swal.fire({
                     title: 'Quên mật khẩu?',
