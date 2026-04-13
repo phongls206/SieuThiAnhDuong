@@ -10,23 +10,34 @@
     <title>Đăng nhập - Siêu thị Ánh Dương</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* ... Các style của bạn giữ nguyên ... */
         :root { 
             --primary-blue: #007bff; 
             --dark-blue: #0056b3;
             --glass-bg: rgba(255, 255, 255, 0.95);
         }
 
+        /* FIX: Khóa cứng layout để không bị dịch khi hiện Popup */
+        html, body {
+            margin: 0;
+            padding: 0 !important;
+            height: 100vh;
+            overflow: hidden !important;
+        }
+
         body { 
             background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-            height: 100vh; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            overflow: hidden; 
             position: relative;
+        }
+
+        /* Ép body không nhảy padding khi Swal hiện */
+        body.swal2-shown {
+            padding-right: 0 !important;
         }
 
         body::before, body::after {
@@ -45,18 +56,23 @@
             background: white;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* Đổ bóng nhẹ mặc định */
             width: 100%;
             max-width: 950px;
             display: flex;
             min-height: 550px;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            border: 1px solid rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            backface-visibility: hidden;
+            transform: translateZ(0);
         }
 
+        /* FIX: Thêm lại Hover bóng nhẹ mượt mà */
         .login-container:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.12);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+            border-color: rgba(0,123,255,0.2);
         }
 
         .login-sidebar { 
@@ -130,9 +146,7 @@
         }
 
         .login-form-section h3 { font-weight: 800; color: #1a1a1a; margin-bottom: 8px; font-size: 1.8rem; }
-        .login-form-section p { color: #888; margin-bottom: 35px; font-size: 0.95rem; }
-        
-        .form-label { color: #444; letter-spacing: 0.5px; }
+        .login-form-section p { color: #888; margin-bottom: 30px; font-size: 0.95rem; }
         
         .input-group { 
             border-radius: 10px; 
@@ -172,12 +186,17 @@
             outline: none;
         }
         .password-toggle:hover { color: var(--primary-blue); }
-        .password-toggle i { font-size: 1.2rem; line-height: 1; }
 
-        .input-group:focus-within { 
-            box-shadow: 0 5px 15px rgba(0,123,255,0.1); 
-            border-color: var(--primary-blue); 
+        .forgot-password {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            display: inline-block;
+            padding: 5px 10px;
+            outline: none !important;
         }
+        .forgot-password:hover { color: var(--dark-blue); text-decoration: underline !important; }
 
         .btn-login { 
             background: linear-gradient(to right, #007bff, #0056b3); 
@@ -189,7 +208,7 @@
             font-size: 1rem;
             transition: 0.4s; 
             width: 100%; 
-            margin-top: 25px; 
+            margin-top: 15px;
             box-shadow: 0 5px 15px rgba(0,123,255,0.3);
         }
 
@@ -199,8 +218,7 @@
             filter: brightness(1.1);
         }
         
-        .footer-text { font-size: 0.85rem; color: #aaa; margin-top: 50px; text-align: center; }
-        .footer-text strong { color: #555; }
+        .footer-text { font-size: 0.85rem; color: #aaa; margin-top: 35px; text-align: center; }
     </style>
 </head>
 <body>
@@ -210,15 +228,12 @@
                 <div id="cartIcon">
                     <i class="bi bi-cart-fill" style="font-size: 4rem; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));"></i>
                 </div>
-                
                 <div id="logoText">
                     <i class="bi bi-cart-fill static-cart"></i>
                     <h2>Siêu Thị<br>Ánh Dương</h2>
                 </div>
             </div>
-            
             <p class="mb-4" style="opacity: 0.9; font-weight: 300;">Phần mềm quản lý bán hàng thông minh, tối ưu hóa quy trình vận hành siêu thị.</p>
-            
             <div class="feature-list">
                 <div class="feature-item"><i class="bi bi-shield-check"></i> Quản lý mặt hàng hiệu quả</div>
                 <div class="feature-item"><i class="bi bi-lightning-charge"></i> Xử lý giao dịch nhanh chóng</div>
@@ -227,9 +242,6 @@
         </div>
 
         <div class="login-form-section">
-            @* --- KHỐI THÔNG BÁO MỚI THÊM VÀO --- *@
-            
-            @* 1. Thông báo khi bị đẩy ra do đăng nhập nơi khác *@
             @if (Context.Request.Query["announcement"] == "session_expired")
             {
                 <div class="alert alert-warning alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
@@ -243,11 +255,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
-
-            @* 2. Thông báo đăng nhập thành công (dùng TempData từ Controller gửi sang) *@
-     
-            
-            @* --- HẾT KHỐI THÔNG BÁO --- *@
 
             <h3>Chào mừng trở lại!</h3>
             <p>Vui lòng đăng nhập để bắt đầu phiên làm việc.</p>
@@ -263,7 +270,7 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-2">
                     <label class="form-label small fw-bold">Mật khẩu</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
@@ -274,9 +281,15 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-login">
+                <button type="submit" class="btn-login mb-3">
                     XÁC NHẬN ĐĂNG NHẬP <i class="bi bi-chevron-right ms-2" style="font-size: 0.8rem;"></i>
                 </button>
+
+                <div class="text-center" style="height: 30px;">
+                    <a href="javascript:void(0)" class="forgot-password small text-muted" id="btnForgot">
+                        Quên mật khẩu?
+                    </a>
+                </div>
             </form>
 
             <div class="footer-text">
@@ -290,8 +303,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Animation Logo
+        $(document).ready(function() {
             const cart = document.getElementById('cartIcon');
             const logo = document.getElementById('logoText');
             if(cart && logo) {
@@ -301,20 +313,26 @@
                 });
             }
 
-            // Xử lý ẩn/hiện mật khẩu
-            const togglePassword = document.querySelector('#togglePassword');
-            const password = document.querySelector('#passwordInput');
-            const eyeIcon = document.querySelector('#eyeIcon');
+            $('#togglePassword').on('click', function () {
+                const password = $('#passwordInput');
+                const eyeIcon = $('#eyeIcon');
+                const type = password.attr('type') === 'password' ? 'text' : 'password';
+                password.attr('type', type);
+                eyeIcon.toggleClass('bi-eye bi-eye-slash');
+            });
 
-            if(togglePassword) {
-                togglePassword.addEventListener('click', function () {
-                    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-                    password.setAttribute('type', type);
-                    
-                    eyeIcon.classList.toggle('bi-eye');
-                    eyeIcon.classList.toggle('bi-eye-slash');
+            // FIX: Thêm heightAuto và scrollbarPadding để giữ form đứng im
+            $('#btnForgot').on('click', function() {
+                Swal.fire({
+                    title: 'Quên mật khẩu?',
+                    text: 'Vui lòng liên hệ Admin để được cấp lại mật khẩu mới.',
+                    icon: 'info',
+                    confirmButtonText: 'Đã hiểu',
+                    confirmButtonColor: '#007bff',
+                    heightAuto: false,
+                    scrollbarPadding: false
                 });
-            }
+            });
         });
     </script>
 </body>

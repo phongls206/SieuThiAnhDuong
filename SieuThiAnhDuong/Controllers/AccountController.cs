@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SieuThiAnhDuong.Data;
-using SieuThiAnhDuong.Models; // Bắt buộc phải có để gọi class SessionControl
+using SieuThiAnhDuong.Models;
 using SieuThiAnhDuong.Models.ViewModels;
 using System.Security.Claims;
-using System; // Thêm thư viện này để dùng Guid
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SieuThiAnhDuong.Controllers
 {
@@ -22,6 +24,7 @@ namespace SieuThiAnhDuong.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
+            // ModelState.IsValid vẫn hoạt động vì mình chỉ xóa thuộc tính trong ViewModel, không ảnh hưởng logic
             if (!ModelState.IsValid) return View(model);
 
             // Tìm user trong DB
@@ -31,15 +34,12 @@ namespace SieuThiAnhDuong.Controllers
 
             if (user != null)
             {
+                // Lấy chức vụ thực tế từ bảng Nhân viên
                 string chucVuThucTe = user.NhanVien?.ChucVu ?? "Nhân viên";
 
                 // ==========================================
-                // [THÊM MỚI] - XỬ LÝ ĐÁ NGƯỜI DÙNG CŨ
-                // 1. Tạo mã phiên mới duy nhất cho lần đăng nhập này
+                // XỬ LÝ ĐÁ NGƯỜI DÙNG CŨ (Single Session)
                 string newSessionId = Guid.NewGuid().ToString();
-
-                // 2. Ghi đè mã phiên mới này vào RAM Server 
-                // (Ai đăng nhập sau sẽ chèn mã mới vào, làm mã cũ của người trước bị vô hiệu)
                 SessionControl.UserSessions[user.TenDangNhap] = newSessionId;
                 // ==========================================
 
@@ -52,21 +52,37 @@ namespace SieuThiAnhDuong.Controllers
                     new Claim("FullName", user.NhanVien?.HoTen ?? user.TenDangNhap),
                     new Claim("MaNV", user.MaNV.ToString()),
                     new Claim("Quyen", user.Quyen ?? "Nhân viên"),
-
-                    // [THÊM MỚI] 3. Đưa mã phiên mới vào Cookie của máy tính này
                     new Claim("UserSessionGuid", newSessionId)
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                // Đăng xuất phiên hiện tại của chính máy này (nếu có bị kẹt) trước khi đăng nhập mới
+                // Đăng xuất phiên hiện tại trước khi đăng nhập mới
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
+                // ==========================================
+                // [ĐÃ SỬA] BỎ GHI NHỚ ĐĂNG NHẬP
+                // IsPersistent = false để đảm bảo an toàn, đóng trình duyệt là hết phiên
+                // ==========================================
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity),
-                    new AuthenticationProperties { IsPersistent = true });
+                    new AuthenticationProperties { IsPersistent = false });
+
                 TempData["Success"] = "Đăng nhập thành công!";
+
+                // ==========================================
+                // ĐIỀU HƯỚNG THÔNG MINH THEO CHỨC VỤ
+                // ==========================================
+                if (chucVuThucTe == "Thủ kho")
+                {
+                    return RedirectToAction("Index", "Product");
+                }
+                else if (chucVuThucTe == "Admin" || chucVuThucTe == "Nhân viên")
+                {
+                    return RedirectToAction("Monthly", "Report");
+                }
+
                 return RedirectToAction("Index", "Home");
             }
 
@@ -79,11 +95,11 @@ namespace SieuThiAnhDuong.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
         }
+
         [HttpGet]
-        [IgnoreAntiforgeryToken] // Tránh lỗi bảo mật khi gọi Ajax
+        [IgnoreAntiforgeryToken]
         public IActionResult CheckSession()
         {
-            // 1. Nếu Cookie đã mất hiệu lực (đã bị SignOut bởi Middleware)
             if (User.Identity == null || !User.Identity.IsAuthenticated)
             {
                 return Json(new { status = "stolen" });
@@ -92,7 +108,6 @@ namespace SieuThiAnhDuong.Controllers
             var userName = User.Identity.Name;
             var currentCookieSession = User.FindFirst("UserSessionGuid")?.Value;
 
-            // 2. So sánh mã trong Cookie với mã mới nhất trong RAM
             if (SessionControl.UserSessions.ContainsKey(userName))
             {
                 if (SessionControl.UserSessions[userName] != currentCookieSession)
@@ -103,6 +118,7 @@ namespace SieuThiAnhDuong.Controllers
 
             return Json(new { status = "ok" });
         }
+
         public async Task<IActionResult> Index()
         {
             var maNVClaim = User.FindFirst("MaNV")?.Value;
@@ -115,6 +131,40 @@ namespace SieuThiAnhDuong.Controllers
                 return View(nhanVien);
             }
             return RedirectToAction("Login");
+        }
+
+        // ==========================================
+        // ACTION ĐỔI MẬT KHẨU (Xử lý AJAX từ trang cá nhân)
+        // ==========================================
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword, string confirmPassword)
+        {
+            var userName = User.Identity.Name;
+            var user = await _context.TaiKhoans.FirstOrDefaultAsync(u => u.TenDangNhap == userName);
+
+            if (user == null)
+                return Json(new { success = false, message = "Không tìm thấy tài khoản." });
+
+            if (user.MatKhau != currentPassword)
+            {
+                return Json(new { success = false, message = "Mật khẩu hiện tại không chính xác." });
+            }
+
+            if (newPassword != confirmPassword)
+            {
+                return Json(new { success = false, message = "Xác nhận mật khẩu mới không khớp." });
+            }
+
+            if (string.IsNullOrEmpty(newPassword) || newPassword.Length < 4)
+            {
+                return Json(new { success = false, message = "Mật khẩu mới phải có ít nhất 4 ký tự." });
+            }
+
+            user.MatKhau = newPassword;
+            _context.TaiKhoans.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Đã đổi mật khẩu thành công!" });
         }
     }
 }

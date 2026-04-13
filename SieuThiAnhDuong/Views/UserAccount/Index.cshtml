@@ -8,21 +8,7 @@
         </button>
     </div>
 
-    @* Thông báo thành công/lỗi *@
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm">
-            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
+    @* Lưu ý: Phần TempData thông báo ở đây có thể giữ lại hoặc bỏ vì mình đã có Toast ở Layout *@
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
@@ -32,7 +18,6 @@
                         <th>Tên đăng nhập</th>
                         <th>Chủ sở hữu (Mã NV)</th>
                         <th>Quyền hạn</th>
-                    
                         <th class="text-center">Thao tác</th>
                     </tr>
                 </thead>
@@ -62,18 +47,18 @@
                           
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-2">
-                                    @* Nút Reset mật khẩu *@
-                                    <form asp-action="ResetPassword" method="post" onsubmit="return confirm('Reset mật khẩu tài khoản này về 123456?')">
+                                    @* SỬA Ở ĐÂY: Thêm class confirm-reset *@
+                                    <form asp-action="ResetPassword" method="post" class="confirm-reset">
                                         <input type="hidden" name="id" value="@item.TenDangNhap" />
                                         <button type="submit" class="btn btn-sm btn-outline-warning" title="Reset mật khẩu">
                                             <i class="bi bi-key-fill"></i>
                                         </button>
                                     </form>
 
-                                    @* Nút Xóa (Chặn xóa tài khoản admin hệ thống) *@
                                     @if (item.TenDangNhap.ToLower() != "admin")
                                     {
-                                        <form asp-action="Delete" method="post" onsubmit="return confirm('Xác nhận xóa tài khoản này? Thao tác này không thể hoàn tác!')">
+                                        @* SỬA Ở ĐÂY: Thêm class confirm-delete *@
+                                        <form asp-action="Delete" method="post" class="confirm-delete">
                                             <input type="hidden" name="id" value="@item.TenDangNhap" />
                                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa tài khoản">
                                                 <i class="bi bi-trash3-fill"></i>
@@ -96,47 +81,52 @@
     </div>
 </div>
 
-@* Modal Cấp tài khoản mới *@
-<div class="modal fade" id="createAccountModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <form asp-action="Create" method="post">
-                @Html.AntiForgeryToken()
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-person-plus-fill me-2"></i>Cấp tài khoản mới</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary small text-uppercase">1. Chọn nhân viên chưa có tài khoản</label>
-                        @* asp-items="ViewBag.MaNV" sẽ nhận danh sách đã lọc từ Controller *@
-                        <select name="MaNV" class="form-select border-primary-subtle" asp-items="ViewBag.MaNV" required>
-                            <option value="">-- Chọn nhân viên --</option>
-                        </select>
-                        <div class="form-text mt-1 italic small text-muted">* Chỉ hiện nhân viên chưa có tài khoản hệ thống.</div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary small text-uppercase">2. Tên đăng nhập</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-person"></i></span>
-                            <input name="TenDangNhap" class="form-control" placeholder="Ví dụ: nhanvien_a" required maxlength="50" />
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary small text-uppercase">3. Mật khẩu khởi tạo</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                            <input name="MatKhau" type="password" class="form-control" placeholder="Nhập mật khẩu" required minlength="6" />
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer bg-light border-top-0">
-                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-success px-4 shadow-sm">
-                        <i class="bi bi-check-lg me-1"></i> Lưu tài khoản
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+@* ... Giữ nguyên phần Modal ... *@
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // 1. Xử lý Reset Mật Khẩu
+            $('.confirm-reset').on('submit', function (e) {
+                e.preventDefault(); // Chặn submit form ngay lập tức
+                var form = this;
+
+                Swal.fire({
+                    title: 'Reset mật khẩu?',
+                    text: "Tài khoản này sẽ được đặt lại mật khẩu về '123456'!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ffc107',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Đồng ý Reset',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit(); // Thực hiện gửi form đi
+                    }
+                });
+            });
+
+            // 2. Xử lý Xóa Tài Khoản
+            $('.confirm-delete').on('submit', function (e) {
+                e.preventDefault();
+                var form = this;
+
+                Swal.fire({
+                    title: 'Xóa tài khoản này?',
+                    text: "Thao tác này sẽ xóa vĩnh viễn và không thể hoàn tác!",
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Xác nhận xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+}

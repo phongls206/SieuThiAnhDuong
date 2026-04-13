@@ -87,20 +87,38 @@
                 <img src="~/images/logo.png" class="logo" alt="Logo">
                 <h6 class="fw-bold text-primary mb-0">ÁNH DƯƠNG MART</h6>
             </div>
-            <ul class="list-unstyled components mb-auto">
-                @if (chucVu == "Admin" || chucVu == "Nhân viên") {
-                    <li class="@(controller == "Invoice" ? "active" : "")"><a asp-controller="Invoice" asp-action="Create"><i class="bi bi-cart4"></i> Bán hàng</a></li>
-                }
-                <li class="@(controller == "Report" ? "active" : "")"><a asp-controller="Report" asp-action="Monthly"><i class="bi bi-graph-up"></i> Thống kê</a></li>
-                @if (chucVu == "Admin" || chucVu == "Thủ kho") {
-                    <li class="@(controller == "Product" ? "active" : "")"><a asp-controller="Product" asp-action="Index"><i class="bi bi-box-seam"></i> Quản lý hàng hóa</a></li>
-                }
-                @if (chucVu == "Admin") {
-                    <li class="@(controller == "UserAccount" ? "active" : "")"><a asp-controller="UserAccount" asp-action="Index"><i class="bi bi-shield-lock"></i> Quản lý tài khoản</a></li>
-                    <li class="@(controller == "Employee" ? "active" : "")"><a asp-controller="Employee" asp-action="Index"><i class="bi bi-people"></i> Quản lý nhân viên</a></li>
-                }
-                <li class="@(controller == "Account" ? "active" : "")"><a asp-controller="Account" asp-action="Index"><i class="bi bi-person-circle"></i> Tài khoản</a></li>
-            </ul>
+          <ul class="list-unstyled components mb-auto">
+    @* Bán hàng: Chỉ Admin và Nhân viên thấy *@
+    @if (chucVu == "Admin" || chucVu == "Nhân viên") {
+        <li class="@(controller == "Invoice" ? "active" : "")">
+            <a asp-controller="Invoice" asp-action="Create"><i class="bi bi-cart4"></i> Bán hàng</a>
+        </li>
+    }
+
+    @* Thống kê: ẨN đối với Thủ kho (Chỉ Admin và Nhân viên thấy) *@
+    @if (chucVu == "Admin" || chucVu == "Nhân viên") {
+        <li class="@(controller == "Report" ? "active" : "")">
+            <a asp-controller="Report" asp-action="Monthly"><i class="bi bi-graph-up"></i> Thống kê</a>
+        </li>
+    }
+
+    @* Quản lý hàng hóa: Admin và Thủ kho thấy *@
+    @if (chucVu == "Admin" || chucVu == "Thủ kho") {
+        <li class="@(controller == "Product" ? "active" : "")">
+            <a asp-controller="Product" asp-action="Index"><i class="bi bi-box-seam"></i> Quản lý hàng hóa</a>
+        </li>
+    }
+
+    @* Quản lý hệ thống: Chỉ Admin thấy *@
+    @if (chucVu == "Admin") {
+        <li class="@(controller == "UserAccount" ? "active" : "")"><a asp-controller="UserAccount" asp-action="Index"><i class="bi bi-shield-lock"></i> Quản lý tài khoản</a></li>
+        <li class="@(controller == "Employee" ? "active" : "")"><a asp-controller="Employee" asp-action="Index"><i class="bi bi-people"></i> Quản lý nhân viên</a></li>
+    }
+
+    <li class="@(controller == "Account" ? "active" : "")">
+        <a asp-controller="Account" asp-action="Index"><i class="bi bi-person-circle"></i> Tài khoản</a>
+    </li>
+</ul>
             <div class="p-3 border-top"> 
                 <button id="btnLogout" class="btn btn-outline-danger w-100 btn-sm">
                     <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
@@ -112,7 +130,7 @@
             <div class="top-info">
                 <div class="menu-side" id="sidebarCollapse"><i class="bi bi-list"></i></div>
                 <div class="announcement-bar d-none d-md-block">
-                    <div class="scrolling-text"><i class="bi bi-megaphone-fill me-2"></i> Chào mừng bạn đến với <strong>Siêu Thị Ánh Dương</strong>!</div>
+                    <div class="scrolling-text"><i class="bi bi-megaphone-fill me-2"></i> Chào mừng bạn đến với <strong>Siêu Thị Ánh Dương</strong> chúc bạn một ngày làm việc vui vẻ và hiệu quả!</div>
                 </div>
                 <div class="user-side">
                     <span class="small d-none d-lg-inline opacity-75">@DateTime.Now.ToString("dd/MM/yyyy")</span>

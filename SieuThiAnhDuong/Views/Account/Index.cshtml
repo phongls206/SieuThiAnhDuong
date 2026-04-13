@@ -18,7 +18,30 @@
                 <div class="row mb-3 border-bottom pb-2">
                     <div class="col-sm-4 text-muted">Chức vụ:</div>
                     <div class="col-sm-8">
-                        <span class="badge bg-info">@Model.ChucVu</span>
+                        @{
+                            var chucVu = Model.ChucVu?.Trim();
+                            if (chucVu != null && chucVu.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+                            {
+                                @* Màu Đỏ cho Admin - In hoa, đổ bóng *@
+                                <span class="badge shadow-sm px-3 py-2 text-uppercase" style="background-color: #dc3545; color: white; min-width: 100px;">
+                               @chucVu
+                                </span>
+                            }
+                            else if (chucVu != null && chucVu.Equals("Thủ kho", StringComparison.OrdinalIgnoreCase))
+                            {
+                                @* Màu Xanh Ngọc cho Thủ kho - Chữ đen *@
+                                <span class="badge shadow-sm px-3 py-2 text-uppercase text-dark" style="background-color: #0dcaf0; min-width: 100px;">
+                                    @chucVu
+                                </span>
+                            }
+                            else
+                            {
+                                @* Màu Xanh Dương cho Nhân viên *@
+                                <span class="badge shadow-sm px-3 py-2 text-uppercase" style="background-color: #0d6efd; color: white; min-width: 100px;">
+                                    @chucVu
+                                </span>
+                            }
+                        }
                     </div>
                 </div>
                 <div class="row mb-3 border-bottom pb-2">
@@ -29,17 +52,89 @@
                     <div class="col-sm-4 text-muted">Địa chỉ:</div>
                     <div class="col-sm-8">@Model.DiaChi</div>
                 </div>
-                
             </div>
         </div>
 
         <div class="col-md-4 text-center">
             <div class="card shadow-sm border-0 p-5 h-100">
                 <img src="https://ui-avatars.com/api/?name=@Model.HoTen&background=random"
-                     class="rounded-circle img-thumbnail mx-auto mb-3 mt-3" style="width: 120px;">
+                     class="rounded-circle img-thumbnail mx-auto mb-3 mt-3 shadow-sm" style="width: 120px;">
                 <h5 class="fw-bold">@Model.HoTen</h5>
-             
+                
+                @* Nút đổi mật khẩu *@
+                <button type="button" class="btn btn-outline-primary btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                    <i class="bi bi-key-fill me-1"></i> Đổi mật khẩu
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+@* Modal Đổi mật khẩu *@
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-shield-lock me-2"></i>Đổi mật khẩu mới</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="changePasswordForm">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Mật khẩu hiện tại</label>
+                        <input type="password" name="currentPassword" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Mật khẩu mới</label>
+                        <input type="password" id="newPassword" name="newPassword" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Xác nhận mật khẩu mới</label>
+                        <input type="password" name="confirmPassword" class="form-control" required>
+                    </div>
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#changePasswordForm').on('submit', function (e) {
+            e.preventDefault();
+            
+            const formData = $(this).serialize();
+
+            $.ajax({
+                url: '@Url.Action("ChangePassword", "Account")',
+                type: 'POST',
+                data: formData,
+                success: function (res) {
+                    if (res.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thành công!',
+                            text: res.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: res.message
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire('Lỗi!', 'Không thể kết nối tới máy chủ.', 'error');
+                }
+            });
+        });
+    </script>
+}
