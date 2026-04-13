@@ -10,6 +10,47 @@
     ViewData["Title"] = "Lập hóa đơn bán hàng";
 }
 
+<style>
+    /* 1. Khung chứa bảng: Tự động co giãn, tối đa 530px mới hiện thanh cuộn */
+    .product-table-wrapper {
+        max-height: 530px; 
+        overflow-y: auto;
+        overflow-x: hidden;
+        /* Tối ưu chống lag (Hardware Acceleration) */
+        -webkit-overflow-scrolling: touch;
+        will-change: scroll-position;
+    }
+
+    /* 2. Cố định tiêu đề bảng */
+    .product-table-wrapper thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background-color: #f8f9fa !important;
+        box-shadow: inset 0 -1px 0 #dee2e6;
+    }
+
+    /* 3. Thanh cuộn màu xám trung tính, bớt nổi */
+    .product-table-wrapper::-webkit-scrollbar { 
+        width: 6px; 
+    }
+    .product-table-wrapper::-webkit-scrollbar-track {
+        background: transparent; /* Để track trong suốt cho đỡ rối */
+    }
+    .product-table-wrapper::-webkit-scrollbar-thumb { 
+        background: #ccc; 
+        border-radius: 10px; 
+    }
+    .product-table-wrapper::-webkit-scrollbar-thumb:hover { 
+        background: #bbb; 
+    }
+
+    /* Tối ưu render hàng để vuốt mượt hơn */
+    #productList tr {
+        transform: translateZ(0);
+    }
+</style>
+
 <div class="container-fluid mt-4">
     <div class="row g-4">
         @* --- CỘT BÊN TRÁI: DANH MỤC SẢN PHẨM --- *@
@@ -25,7 +66,7 @@
                     </div>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
+                    <div class="table-responsive product-table-wrapper">
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
@@ -64,7 +105,7 @@
                                                        max="@p.SoLuongTon"
                                                        oninput="checkQty(@p.MaSP, @p.SoLuongTon)"
                                                        class="form-control text-center fw-bold border-primary"
-                                                @(p.SoLuongTon <= 0 ? "disabled" : "") />
+                                                 @(p.SoLuongTon <= 0 ? "disabled" : "") />
                                             </div>
                                         </td>
                                         <td class="text-end pe-3">
@@ -124,46 +165,24 @@
 <script>
     let cart = [];
 
-    // --- 0. LOGIC TÌM KIẾM SẢN PHẨM TRONG BẢNG ---
+    // Tìm kiếm nhanh
     document.getElementById('searchProduct').addEventListener('input', function () {
         let filter = this.value.toLowerCase().trim();
         let rows = document.querySelectorAll('#productList tr');
-
         rows.forEach(row => {
-            // Lấy tên sản phẩm ở cột đầu tiên
             let productName = row.querySelector('td:first-child').innerText.toLowerCase();
-            if (productName.includes(filter)) {
-                row.style.display = ""; // Hiện
-            } else {
-                row.style.display = "none"; // Ẩn
-            }
+            row.style.display = productName.includes(filter) ? "" : "none";
         });
     });
 
-    // 1. Kiểm tra số lượng khi nhập (Input)
     function checkQty(id, maxStock) {
         let qtyInput = document.getElementById('qty-' + id);
         let btnAdd = document.getElementById('btn-add-' + id);
         let currentVal = parseInt(qtyInput.value);
 
-        if (currentVal < 0 || isNaN(currentVal)) {
-            qtyInput.value = 0;
-            currentVal = 0;
-        }
-
+        if (currentVal < 0 || isNaN(currentVal)) { qtyInput.value = 0; currentVal = 0; }
         if (currentVal > maxStock) {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true
-            });
-            Toast.fire({
-                icon: 'warning',
-                title: 'Vượt quá tồn kho! (Tối đa: ' + maxStock + ')'
-            });
-            
+            Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'warning', title: 'Tối đa: ' + maxStock });
             qtyInput.value = maxStock;
             currentVal = maxStock;
         }
@@ -177,44 +196,23 @@
         }
     }
 
-    // 2. Thêm vào giỏ hàng
     function addToCart(id, name, price, maxStock) {
         let qtyInput = document.getElementById('qty-' + id);
         let qty = parseInt(qtyInput.value);
-
         if (isNaN(qty) || qty <= 0) return;
 
         let existingItem = cart.find(item => item.maSP === id);
         let totalInCart = (existingItem ? existingItem.soLuong : 0) + qty;
 
         if (totalInCart > maxStock) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Không thể thêm!',
-                text: 'Tổng số lượng trong giỏ hàng đã vượt quá tồn kho của mặt hàng này.',
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'Đã hiểu'
-            });
+            Swal.fire({ icon: 'error', title: 'Hết hàng!', text: 'Tổng số lượng vượt quá tồn kho.', confirmButtonText: 'Đã hiểu' });
             return;
         }
 
-        if (existingItem) {
-            existingItem.soLuong += qty;
-        } else {
-            cart.push({ maSP: id, ten: name, soLuong: qty, donGia: price });
-        }
+        if (existingItem) existingItem.soLuong += qty;
+        else cart.push({ maSP: id, ten: name, soLuong: qty, donGia: price });
 
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 1500
-        });
-        Toast.fire({
-            icon: 'success',
-            title: 'Đã thêm ' + name + ' vào giỏ'
-        });
-
+        Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, icon: 'success', title: 'Đã thêm vào giỏ' });
         qtyInput.value = (maxStock > 0) ? 1 : 0;
         checkQty(id, maxStock);
         renderCart();
@@ -224,11 +222,7 @@
         let html = '';
         let total = 0;
         if (cart.length === 0) {
-            html = `
-                <li class="text-muted text-center py-5">
-                    <i class="bi bi-cart-x display-4 d-block mb-2 opacity-25"></i>
-                    Chưa có sản phẩm nào
-                </li>`;
+            html = `<li class="text-muted text-center py-5"><i class="bi bi-cart-x display-4 d-block mb-2 opacity-25"></i>Chưa có sản phẩm nào</li>`;
         } else {
             cart.forEach((item, index) => {
                 let subTotal = item.soLuong * item.donGia;
@@ -240,7 +234,7 @@
                         </div>
                         <div class="text-end pe-2">
                             <div class="fw-bold text-primary">${subTotal.toLocaleString()} đ</div>
-                            <button onclick="removeFromCart(${index})" class="btn btn-link btn-sm text-danger p-0 border-0 shadow-none"><i class="bi bi-trash"></i> Xóa</button>
+                            <button onclick="removeFromCart(${index})" class="btn btn-link btn-sm text-danger p-0 border-0 shadow-none"><i class="bi bi-trash"></i></button>
                         </div>
                     </li>`;
                 total += subTotal;
@@ -255,50 +249,31 @@
         renderCart();
     }
 
-    // 3. Hoàn tất đơn hàng (Thanh toán)
     function finishOrder() {
         if (cart.length === 0) {
-            Swal.fire({
-                icon: 'info',
-                title: 'Giỏ hàng đang trống!',
-                text: 'Bạn hãy chọn sản phẩm trước khi thanh toán nhé.',
-                confirmButtonColor: '#198754',
-                confirmButtonText: 'Quay lại chọn hàng'
-            });
+            Swal.fire({ icon: 'info', title: 'Giỏ hàng trống!' });
             return;
         }
 
         Swal.fire({
             title: 'Xác nhận thanh toán?',
-            text: "Hệ thống sẽ ghi nhận hóa đơn và in phiếu cho khách hàng.",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#198754',
-            cancelButtonColor: '#6c757d',
             confirmButtonText: 'Đúng, hoàn tất!',
             cancelButtonText: 'Kiểm tra lại'
         }).then((result) => {
             if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Đang xử lý...',
-                    allowOutsideClick: false,
-                    didOpen: () => { Swal.showLoading(); }
-                });
-
+                Swal.showLoading();
                 let form = document.createElement("form");
                 form.method = "POST";
                 form.action = "/Invoice/Create";
-
-                let ptThanhToan = document.getElementById("phuongThucThanhToan").value;
-                appendHiddenInput(form, "phuongThucThanhToan", ptThanhToan);
-                appendHiddenInput(form, "__RequestVerificationToken", document.querySelector('input[name="__RequestVerificationToken"]')?.value || "");
-
+                appendHiddenInput(form, "phuongThucThanhToan", document.getElementById("phuongThucThanhToan").value);
                 cart.forEach((item, i) => {
                     appendHiddenInput(form, `details[${i}].MaSP`, item.maSP);
                     appendHiddenInput(form, `details[${i}].SoLuong`, item.soLuong);
                     appendHiddenInput(form, `details[${i}].DonGia`, item.donGia);
                 });
-
                 document.body.appendChild(form);
                 form.submit();
             }
@@ -307,9 +282,7 @@
 
     function appendHiddenInput(form, name, value) {
         let input = document.createElement("input");
-        input.type = "hidden";
-        input.name = name;
-        input.value = value;
+        input.type = "hidden"; input.name = name; input.value = value;
         form.appendChild(input);
     }
 </script>
