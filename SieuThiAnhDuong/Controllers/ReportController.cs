@@ -11,7 +11,8 @@ namespace SieuThiAnhDuong.Controllers
         private readonly ApplicationDbContext _context;
         public ReportController(ApplicationDbContext context) => _context = context;
 
-        public async Task<IActionResult> Monthly(string searchString, DateTime? searchDate, string selectCa, int? selectNV, int page = 1)
+        // Cập nhật searchDate thành string và thêm filterType
+        public async Task<IActionResult> Monthly(string searchString, string searchDate, string selectCa, int? selectNV, string filterType, int page = 1)
         {
             int pageSize = 20;
             var maNVClaim = User.FindFirst("MaNV")?.Value;
@@ -43,21 +44,36 @@ namespace SieuThiAnhDuong.Controllers
             if (!string.IsNullOrEmpty(searchString))
             {
                 string s = searchString.Trim();
-                // Tìm theo Mã hóa đơn (nếu là số) HOẶC Tên nhân viên
                 query = query.Where(h => h.MaHD.ToString().Contains(s) || h.NhanVien.HoTen.Contains(s));
             }
 
-            // --- 3. BỘ LỌC THEO NGÀY VÀ CA ---
-            if (searchDate.HasValue)
+            // --- 3. BỘ LỌC THỜI GIAN LINH HOẠT (Ngày/Tháng/Năm) ---
+            if (!string.IsNullOrEmpty(searchDate))
             {
-                query = query.Where(h => h.NgayLap.Date == searchDate.Value.Date);
+                if (filterType == "year" && int.TryParse(searchDate, out int year))
+                {
+                    // Lọc theo năm
+                    query = query.Where(h => h.NgayLap.Year == year);
+                }
+                else if (filterType == "month" && DateTime.TryParse(searchDate, out DateTime monthDate))
+                {
+                    // Lọc theo tháng (chuỗi yyyy-MM)
+                    query = query.Where(h => h.NgayLap.Year == monthDate.Year && h.NgayLap.Month == monthDate.Month);
+                }
+                else if (DateTime.TryParse(searchDate, out DateTime fullDate))
+                {
+                    // Lọc theo ngày (mặc định hoặc yyyy-MM-dd)
+                    query = query.Where(h => h.NgayLap.Date == fullDate.Date);
+                }
             }
+
+            // Lọc theo ca trực
             if (!string.IsNullOrEmpty(selectCa))
             {
                 query = query.Where(h => h.CaTruc == selectCa);
             }
 
-            // --- 4. TÍNH TOÁN THỐNG KÊ (Trước khi phân trang) ---
+            // --- 4. TÍNH TOÁN THỐNG KÊ (Tính trên dữ liệu đã lọc nhưng chưa phân trang) ---
             var allFilteredData = await query.ToListAsync();
             ViewBag.SoHoaDon = allFilteredData.Count;
             ViewBag.TongDoanhThu = allFilteredData.Sum(h => h.TongTien);
@@ -72,7 +88,7 @@ namespace SieuThiAnhDuong.Controllers
             if (totalPages > 0 && page > totalPages) page = totalPages;
 
             var hoadonsPaging = await query
-                .OrderByDescending(h => h.MaHD)
+                .OrderByDescending(h => h.NgayLap) // Sắp xếp theo ngày lập mới nhất
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -81,7 +97,8 @@ namespace SieuThiAnhDuong.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
             ViewBag.CurrentSearch = searchString;
-            ViewBag.CurrentDate = searchDate?.ToString("yyyy-MM-dd");
+            ViewBag.CurrentDate = searchDate;
+            ViewBag.FilterType = filterType;
             ViewBag.CurrentCa = selectCa;
             ViewBag.CurrentNV = selectNV;
 

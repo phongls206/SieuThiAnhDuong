@@ -15,12 +15,14 @@
                         @Html.AntiForgeryToken()
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-2 fw-bold small"></div>
 
+                        @* Họ và tên *@
                         <div class="mb-2">
                             <label class="form-label fw-bold small mb-1">Họ và tên</label>
                             <input asp-for="HoTen" class="form-control form-control-sm" placeholder="Nhập đầy đủ họ tên..." />
-                            <span asp-validation-for="HoTen" class="text-danger small"></span>
+                            <span asp-validation-for="HoTen" class="text-danger" style="font-size: 0.75rem;"></span>
                         </div>
 
+                        @* Giới tính & Chức vụ *@
                         <div class="row g-2 mb-2">
                             <div class="col-6">
                                 <label class="form-label fw-bold small mb-1">Giới tính</label>
@@ -30,6 +32,7 @@
                                     <option value="Nữ">Nữ</option>
                                     <option value="Khác">Khác</option>
                                 </select>
+                                <span asp-validation-for="GioiTinh" class="text-danger" style="font-size: 0.75rem;"></span>
                             </div>
                             <div class="col-6">
                                 <label class="form-label fw-bold small mb-1">Chức vụ</label>
@@ -39,24 +42,31 @@
                                     <option value="Thủ kho">Thủ kho</option>
                                     <option value="Nhân viên">Nhân viên</option>
                                 </select>
+                                <span asp-validation-for="ChucVu" class="text-danger" style="font-size: 0.75rem;"></span>
                             </div>
                         </div>
 
+                        @* Ngày sinh *@
                         <div class="mb-2">
                             <label class="form-label fw-bold small mb-1">Ngày sinh</label>
                             <input asp-for="NgaySinh" type="date" class="form-control form-control-sm"
                                    max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="NgaySinh" class="text-danger" style="font-size: 0.75rem;"></span>
                         </div>
 
+                        @* Số điện thoại *@
                         <div class="mb-2">
                             <label class="form-label fw-bold small mb-1">Số điện thoại</label>
                             <input asp-for="SoDT" class="form-control form-control-sm" maxlength="10"
                                    placeholder="Đủ 10 số..." oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
+                            <span asp-validation-for="SoDT" class="text-danger" style="font-size: 0.75rem;"></span>
                         </div>
 
+                        @* Địa chỉ *@
                         <div class="mb-3">
                             <label class="form-label fw-bold small mb-1">Địa chỉ</label>
                             <input asp-for="DiaChi" class="form-control form-control-sm" placeholder="Số nhà, tên đường..." />
+                            <span asp-validation-for="DiaChi" class="text-danger" style="font-size: 0.75rem;"></span>
                         </div>
 
                         <div class="d-grid gap-2 pt-2 border-top">
@@ -71,6 +81,16 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Giúp thông báo lỗi hiện ngay dưới ô input mà không làm vỡ form */
+    .text-danger {
+        display: block;
+        margin-top: 2px;
+        font-weight: 500;
+    }
+    .card { border-radius: 10px; overflow: hidden; }
+</style>
 
 @section Scripts {
     @{
