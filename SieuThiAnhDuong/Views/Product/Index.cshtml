@@ -8,73 +8,78 @@
         </a>
     </div>
 
-    @* --- THANH TÌM KIẾM LINH ĐỘNG (Đã sửa từ form thành input trực tiếp) --- *@
-    <div class="mb-4">
-        <div class="input-group shadow-sm" style="max-width: 500px;">
-            <span class="input-group-text bg-white border-primary text-primary"><i class="bi bi-search"></i></span>
-            <input type="text" id="productSearchInput" class="form-control border-primary"
-                   placeholder="Nhập tên sản phẩm hoặc mã SP để tìm nhanh..." />
+    @* --- THANH CÔNG CỤ --- *@
+    <div class="row mb-4 g-2 align-items-stretch">
+        <div class="col-md-5">
+            <div class="input-group shadow-sm h-100">
+                <span class="input-group-text bg-white border-primary text-primary"><i class="bi bi-search"></i></span>
+                <input type="text" id="customSearchInput" class="form-control border-primary"
+                       placeholder="Tìm tên hoặc mã sản phẩm..." />
+            </div>
+        </div>
+
+        <div class="col-md-auto">
+            <div class="dropdown h-100">
+                <button class="btn btn-outline-primary dropdown-toggle shadow-sm h-100 d-flex align-items-center" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-funnel me-1"></i> Lọc trạng thái: <span id="currentFilterText" class="ms-1">Tất cả</span>
+                </button>
+                <ul class="dropdown-menu shadow border-0">
+                    <li><a class="dropdown-item filter-opt" href="#" data-status="all" data-text="Tất cả">Tất cả</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item filter-opt text-success" href="#" data-status="instock" data-text="Còn hàng">Còn hàng</a></li>
+                    <li><a class="dropdown-item filter-opt text-warning" href="#" data-status="lowstock" data-text="Sắp hết">Sắp hết</a></li>
+                    <li><a class="dropdown-item filter-opt text-danger" href="#" data-status="outstock" data-text="Hết hàng">Hết hàng</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-auto">
+           <button type="button" id="btnReload" 
+        class="btn bg-white border shadow-sm text-secondary h-100 d-flex align-items-center btn-reload-custom" 
+        title="Tải lại bảng">
+    <i class="bi bi-arrow-clockwise me-1"></i>
+</button>
         </div>
     </div>
 
-
+    @* --- BẢNG DỮ LIỆU --- *@
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+                <table id="productTable" class="table table-hover align-middle mb-0">
                     <thead class="table-dark">
                         <tr>
-                            <th class="ps-4" style="width: 100px;">Mã SP</th>
-                            <th>Tên sản phẩm</th>
-                            <th style="width: 150px;">Giá bán</th>
-                            <th style="width: 180px;">Tồn kho</th>
-                            <th style="width: 120px;">Đơn vị</th>
-                            <th class="text-center" style="width: 200px;">Thao tác</th>
+                            <th class="ps-4 no-sort" style="width: 100px;">Mã SP</th>
+                            <th class="can-sort">Tên sản phẩm</th>
+                            <th class="can-sort" style="width: 150px;">Giá bán</th>
+                            <th class="text-center can-sort" style="width: 180px;">Tồn kho</th>
+                            <th class="no-sort text-center" style="width: 120px;">Đơn vị</th>
+                            <th class="text-center no-sort" style="width: 200px;">Thao tác</th>
                         </tr>
                     </thead>
-                    <tbody id="productTableBody">
+                    <tbody>
                         @foreach (var item in Model)
                         {
                             <tr>
                                 <td class="ps-4 fw-bold text-muted">#@item.MaSP</td>
-                                <td>
-                                    <div class="fw-bold text-dark product-name">@item.TenSP</div>
-                                </td>
+                                <td><div class="fw-bold text-dark">@item.TenSP</div></td>
                                 <td class="text-danger fw-bold">@item.GiaBan.ToString("N0") đ</td>
-                                <td>
-                                    @if (item.SoLuongTon <= 0)
-                                    {
-                                        <span class="badge bg-danger shadow-sm py-2 px-3 w-100">
-                                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Hết hàng (@item.SoLuongTon)
-                                        </span>
-                                    }
-                                    else if (item.SoLuongTon < 10)
-                                    {
-                                        <span class="badge bg-warning text-dark shadow-sm py-2 px-3 w-100">
-                                            <i class="bi bi-hourglass-split me-1"></i> Sắp hết (@item.SoLuongTon)
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-success shadow-sm py-2 px-3 w-100">
-                                            <i class="bi bi-check2-all me-1"></i> Còn hàng (@item.SoLuongTon)
-                                        </span>
+                                <td class="text-center">
+                                    @if (item.SoLuongTon <= 0) {
+                                        <span class="badge bg-danger shadow-sm py-2 px-3 badge-custom">Hết hàng (@item.SoLuongTon)</span>
+                                    } else if (item.SoLuongTon < 10) {
+                                        <span class="badge bg-warning text-dark shadow-sm py-2 px-3 badge-custom">Sắp hết (@item.SoLuongTon)</span>
+                                    } else {
+                                        <span class="badge bg-success shadow-sm py-2 px-3 badge-custom">Còn hàng (@item.SoLuongTon)</span>
                                     }
                                 </td>
-                                <td><span class="text-muted">@item.DonViTinh</span></td>
+                                <td class="text-center"><span class="text-muted">@item.DonViTinh</span></td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <a asp-action="Edit" asp-route-id="@item.MaSP"
-                                               class="btn btn-sm btn-outline-warning px-3" title="Sửa">
-                                            <i class="bi bi-pencil-square"></i> Sửa
-                                        </a>
-
-                                        <form asp-action="Delete" asp-route-id="@item.MaSP" method="post"
-                                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')">
+                                        <a asp-action="Edit" asp-route-id="@item.MaSP" class="btn btn-sm btn-outline-warning px-3"><i class="bi bi-pencil-square"></i> Sửa</a>
+                                        <form asp-action="Delete" asp-route-id="@item.MaSP" method="post" class="delete-form">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-outline-danger px-3" title="Xóa">
-                                                <i class="bi bi-trash"></i> Xóa
-                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger px-3 btn-delete"><i class="bi bi-trash"></i> Xóa</button>
                                         </form>
                                     </div>
                                 </td>
@@ -87,26 +92,125 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const searchInput = document.getElementById('productSearchInput');
-        const tableBody = document.getElementById('productTableBody');
-        const rows = tableBody.getElementsByTagName('tr');
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        searchInput.addEventListener('input', function () {
-            const filter = searchInput.value.toLowerCase().trim();
+    <script>
+        $(document).ready(function () {
+            var table = $('#productTable').DataTable({
+                "dom": 'rt<"d-flex justify-content-between align-items-center p-3"ip>',
+                "pageLength": 10,
+                "ordering": true,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json",
+                    "paginate": {
+                        "previous": '<i class="bi bi-chevron-double-left"></i>',
+                        "next": '<i class="bi bi-chevron-double-right"></i>'
+                    }
+                },
+                "columnDefs": [
+                    { "orderable": false, "targets": [0, 4, 5] },
+                    { "orderable": true, "targets": [1, 2, 3] }
+                ],
+                "order": []
+            });
 
-            for (let i = 0; i < rows.length; i++) {
-                // Lấy nội dung Mã SP và Tên SP để tìm kiếm
-                const maSP = rows[i].getElementsByTagName('td')[0].innerText.toLowerCase();
-                const tenSP = rows[i].querySelector('.product-name').innerText.toLowerCase();
+            $('#customSearchInput').on('keyup', function () { table.search(this.value).draw(); });
 
-                if (maSP.includes(filter) || tenSP.includes(filter)) {
-                    rows[i].style.display = "";
-                } else {
-                    rows[i].style.display = "none";
-                }
-            }
+            $('.filter-opt').on('click', function (e) {
+                e.preventDefault();
+                var status = $(this).data('status');
+                var text = $(this).data('text');
+                $('#currentFilterText').text(text);
+                if (status === "all") table.column(3).search('').draw();
+                else table.column(3).search(text).draw();
+            });
+
+            $('#btnReload').on('click', function() {
+                location.reload();
+            });
+
+            $('.btn-delete').on('click', function () {
+                var form = $(this).closest('form');
+                Swal.fire({
+                    title: 'Xác nhận xóa?', text: "Dữ liệu sẽ mất vĩnh viễn!", icon: 'warning',
+                    showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy', reverseButtons: true
+                }).then((result) => { if (result.isConfirmed) form.submit(); });
+            });
         });
-    });
-</script>
+    </script>
+
+    <style>
+        /* 1. XÓA ICON MẶC ĐỊNH */
+        table.dataTable thead th::before,
+        table.dataTable thead th::after {
+            content: none !important;
+            display: none !important;
+        }
+
+        /* 2. STYLE ICON SORT CUSTOM */
+        .can-sort {
+            position: relative !important;
+            cursor: pointer !important;
+        }
+        .can-sort::before {
+            content: "↕" !important;
+            display: inline-block !important;
+            margin-right: 6px;
+            opacity: 0.4;
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+
+        .no-sort {
+            pointer-events: none !important;
+            cursor: default !important;
+        }
+
+        .badge-custom {
+            display: inline-block !important;
+            width: auto !important;
+            min-width: 115px;
+            font-weight: 600;
+        }
+
+        /* 3. CUSTOM PHÂN TRANG GIỐNG ẢNH MẪU */
+        .pagination { 
+            gap: 8px; /* Khoảng cách giữa các nút */
+            margin-top: 10px;
+        }
+
+        .page-item .page-link {
+            border-radius: 12px !important; /* Bo tròn các nút */
+            border: 1px solid #f0f0f0;
+            color: #555;
+            padding: 8px 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        /* Nút đang được chọn (Active) - Màu xanh dương đậm */
+        .page-item.active .page-link {
+            background-color: #007bff !important;
+            border-color: #007bff !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        .page-item .page-link:hover {
+            background-color: #f8f9fa;
+            color: #007bff;
+        }
+
+        /* Ẩn bớt text info nếu cần để gọn */
+        .dataTables_info {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
+}

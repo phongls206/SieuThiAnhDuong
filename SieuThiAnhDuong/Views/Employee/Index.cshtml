@@ -8,20 +8,7 @@
         </a>
     </div>
 
-    @* Thông báo *@
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm">
-            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+  
     }
 
     <div class="card shadow-sm border-0">
@@ -34,7 +21,7 @@
                         <th class="text-center">Ngày sinh</th>
                         <th>Số điện thoại</th>
                         <th>Địa chỉ</th>
-                        <th class="text-center">Chức vụ</th> @* Đã chuyển ra sau *@
+                        <th class="text-center">Chức vụ</th>
                         <th class="text-center">Thao tác</th>
                     </tr>
                 </thead>
@@ -60,7 +47,6 @@
                             <td>@item.SoDT</td>
                             <td class="text-truncate" style="max-width: 200px;" title="@item.DiaChi">@item.DiaChi</td>
                             
-                            @* Cột Chức vụ *@
                             <td class="text-center">
                                 @if (item.ChucVu == "Admin")
                                 {
@@ -84,9 +70,9 @@
 
                                     @if (item.MaNV != 1)
                                     {
-                                        <form asp-action="Delete" method="post" onsubmit="return confirm('Xóa nhân viên này?')">
+                                        <form asp-action="Delete" method="post" class="delete-form">
                                             <input type="hidden" name="id" value="@item.MaNV" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete" data-name="@item.HoTen" title="Xóa">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -106,3 +92,31 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+        $('.btn-delete').on('click', function () {
+        var form = $(this).closest('form');
+        var nvName = $(this).data('name');
+
+        Swal.fire({
+        title: 'Xác nhận xóa?',
+        text: "Bạn có chắc muốn xóa nhân viên [" + nvName + "] không? Hành động này không thể hoàn tác!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Đồng ý xóa',
+        cancelButtonText: 'Hủy bỏ',
+        reverseButtons: true
+        }).then((result) => {
+        if (result.isConfirmed) {
+        form.submit();
+        }
+        });
+        });
+        });
+    </script>
+}
