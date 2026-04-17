@@ -56,6 +56,7 @@
                 <div class="col-12 col-md-4">
                     <label class="form-label small fw-bold text-primary">Lọc thời gian</label>
                     <div class="input-group shadow-sm">
+                        <span class="input-group-text bg-white border-primary text-primary"><i class="bi bi-calendar3"></i></span>
                         <select id="filterType" name="filterType" class="form-select border-primary" style="max-width: 100px;" onchange="updateInputType()">
                             <option value="date" selected="@(ViewBag.FilterType == "date")">Ngày</option>
                             <option value="month" selected="@(ViewBag.FilterType == "month")">Tháng</option>
@@ -133,7 +134,6 @@
                                         <span class="badge-payment bg-primary-light text-primary"><i class="bi bi-credit-card me-1"></i> @item.PhuongThucThanhToan</span>
                                     }
                                 </td>
-                                @* FIX: Thêm data-sort bằng số nguyên thuần túy *@
                                 <td class="text-end fw-bold text-danger pe-4" data-sort="@((long)item.TongTien)">
                                     @item.TongTien.ToString("N0") đ
                                 </td>
@@ -176,10 +176,16 @@
                 "dom": 'rt<"d-flex flex-column flex-md-row justify-content-between align-items-center p-3"ip>',
                 "pageLength": 10,
                 "ordering": true,
-                "language": { "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json" },
+                "language": { 
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json",
+                    "paginate": {
+                        "previous": '<i class="bi bi-chevron-double-left"></i>',
+                        "next": '<i class="bi bi-chevron-double-right"></i>'
+                    }
+                },
                 "columnDefs": [
                     { "orderable": false, "targets": "no-sort" },
-                    { "type": "num", "targets": 5 } // Ép DataTables hiểu cột 5 là kiểu số
+                    { "type": "num", "targets": 5 }
                 ],
                 "order": [[1, 'desc']]
             });
@@ -206,7 +212,6 @@
 
         function sortByPriceDesc() {
             var table = $('#invoiceTable').DataTable();
-            // Clear các sắp xếp cũ và ưu tiên sắp xếp cột tiền (index 5) giảm dần
             table.order([5, 'desc']).draw();
             scrollToTable();
         }
@@ -221,6 +226,8 @@
             h3 { font-size: 1.25rem; }
             .card-stat h3 { font-size: 1.1rem !important; }
         }
+        
+        /* Table & Icons */
         table.dataTable thead th::before, table.dataTable thead th::after { content: none !important; display: none !important; }
         .can-sort::before { content: "↕"; display: inline-block; margin-right: 5px; opacity: 0.3; }
         .card-stat { transition: transform 0.2s; cursor: pointer; }
@@ -228,5 +235,40 @@
         .badge-payment { padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; }
         .bg-success-light { background-color: rgba(25, 135, 84, 0.12) !important; }
         .bg-primary-light { background-color: rgba(13, 110, 253, 0.12) !important; }
+
+        /* Custom Pagination (Phân trang giống mẫu) */
+        .pagination {
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .page-item .page-link {
+            border: 1px solid #eee !important;
+            border-radius: 12px !important;
+            color: #666;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background-color: #fff;
+        }
+        .page-item.active .page-link {
+            background-color: #0d6efd !important;
+            border-color: #0d6efd !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+        }
+        .page-item:not(.active) .page-link:hover {
+            background-color: #f8f9fa;
+            color: #0d6efd;
+            border-color: #0d6efd !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0 !important;
+            border: none !important;
+            background: none !important;
+        }
     </style>
 }
