@@ -36,12 +36,12 @@
 
     #productList tr { transform: translateZ(0); }
 
-    /* --- Responsive cho Mobile --- */
+    /* --- Responsive Mobile --- */
     @@media (max-width: 767.98px) {
-        .product-table-wrapper { max-height: 400px; } /* Giảm chiều cao bảng trên mobile để nhường chỗ cho giỏ hàng */
+        .product-table-wrapper { max-height: 400px; } 
         .card-header h4 { font-size: 1.1rem; }
         #searchProduct { font-size: 0.9rem; }
-        .table thead { display: none; } /* Ẩn tiêu đề bảng trên mobile để tiết kiệm diện tích */
+        .table thead { display: none; } 
         .table td { display: block; text-align: left !important; border: none; padding: 0.5rem 1rem; }
         .table tr { display: block; border-bottom: 1px solid #eee; padding: 10px 0; }
         
@@ -110,7 +110,7 @@
                                                 }
                                             </div>
                                         </td>
-                                        @* Group input và button lại để responsive đẹp hơn trên điện thoại *@
+                                        @* Group input và button lại để responsive *@
                                         <td colspan="2">
                                             <div class="d-flex align-items-center justify-content-between gap-2 px-2 px-md-0">
                                                 <div style="width: 100px;">
@@ -177,7 +177,7 @@
 </div>
 
 <script>
-    // GIỮ NGUYÊN TOÀN BỘ JS CỦA BẠN
+   
     let cart = [];
 
     document.getElementById('searchProduct').addEventListener('input', function () {

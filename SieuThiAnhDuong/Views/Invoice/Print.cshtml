@@ -21,7 +21,7 @@
             flex-direction: column; 
             justify-content: center; 
             align-items: center;     
-            padding: 20px 0; /* Thêm padding để không bị dính mép màn hình */
+            padding: 20px 0; 
         }
 
         .ticket { 
@@ -32,17 +32,17 @@
             border-radius: 8px;
             display: flex;
             flex-direction: column;
-            max-height: 80vh; /* Giới hạn hóa đơn cao tối đa 80% màn hình */
+            max-height: 80vh; 
         }
 
-        /* --- PHẦN QUAN TRỌNG: TẠO THANH CUỘN CHO DANH SÁCH SẢN PHẨM --- */
+        /* --- THANH CUỘN CHO DANH SÁCH SẢN PHẨM --- */
         .product-scroll {
             overflow-y: auto;
-            flex: 1; /* Tự động co giãn */
+            flex: 1; 
             margin: 10px 0;
             padding-right: 5px;
         }
-        /* Tùy chỉnh thanh cuộn cho nhỏ gọn đẹp mắt */
+      
         .product-scroll::-webkit-scrollbar { width: 4px; }
         .product-scroll::-webkit-scrollbar-thumb { background: #dee2e6; border-radius: 10px; }
 

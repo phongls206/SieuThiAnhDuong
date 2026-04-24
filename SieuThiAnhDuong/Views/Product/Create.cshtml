@@ -20,13 +20,13 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Giá bán (đ)</label>
-                        @* Chặn số âm bằng min="0" *@
+                       
                         <input asp-for="GiaBan" type="number" min="0" step="any" class="form-control" placeholder="0" required />
                         <span asp-validation-for="GiaBan" class="text-danger small"></span>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Số lượng tồn kho ban đầu</label>
-                        @* Đổi thành TonKho và thêm min="0" *@
+                     
                         <input asp-for="SoLuongTon" type="number" min="0" class="form-control" placeholder="0" required />
                         <span asp-validation-for="SoLuongTon" class="text-danger small"></span>
                     </div>
@@ -34,7 +34,7 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Đơn vị tính</label>
-                    @* Đổi thành DonVi *@
+               
                     <input asp-for="DonViTinh" class="form-control" placeholder="Gói, Chai, Cái, Kg..." required />
                     <span asp-validation-for="DonViTinh" class="text-danger small"></span>
                 </div>

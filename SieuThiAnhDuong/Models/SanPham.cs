@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation; // Thêm dòng này
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation; 
 
 namespace SieuThiAnhDuong.Models
 {

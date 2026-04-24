@@ -22,13 +22,13 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Giá bán (đ)</label>
-                        @* Thêm min="0" để chặn nhập số âm từ trình duyệt *@
+                       
                         <input asp-for="GiaBan" type="number" min="0" class="form-control" placeholder="0" required />
                         <span asp-validation-for="GiaBan" class="text-danger small"></span>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Số lượng tồn kho</label>
-                        @* Thêm min="0" và đổi tên thành TonKho cho khớp Model *@
+                        
                         <input asp-for="SoLuongTon" type="number" min="0" class="form-control" placeholder="0" required />
                         <span asp-validation-for="SoLuongTon" class="text-danger small"></span>
                     </div>
@@ -36,7 +36,7 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Đơn vị tính</label>
-                    @* Đổi tên thành DonVi cho khớp Model *@
+                 
                     <input asp-for="DonViTinh" class="form-control" placeholder="Ví dụ: Cái, Gói, Chai..." />
                     <span asp-validation-for="DonViTinh" class="text-danger small"></span>
                 </div>

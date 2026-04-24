@@ -54,7 +54,7 @@ namespace SieuThiAnhDuong.Controllers
             {
                 try
                 {
-                    // --- LOGIC PHÂN CA THEO KHUNG GIỜ 7H - 22H ---
+                    // ---PHÂN CA THEO KHUNG GIỜ 7H - 22H ---
                     var bayGio = DateTime.Now;
                     int gio = bayGio.Hour;
                     int phut = bayGio.Minute;
